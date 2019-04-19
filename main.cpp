@@ -1,4 +1,3 @@
-#include "mainwindow.h"
 #include "detection.h"
 #include "gamewindow.h"
 #include <QApplication>
