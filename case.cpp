@@ -4,17 +4,12 @@ Case::Case()
 {
 
 }
-Case::Case(bool personnage){
-    this->personnage = personnage;
-    this->cristal = false;
-    this->display();
-
-}
 Case::Case(bool personnage, bool cristal): QLabel()
 {
     this->personnage = personnage;
     this->cristal = cristal;
-
+    this->start_personnage = personnage;
+    this->start_cristal = cristal;
     this->display();
 }
 
@@ -35,21 +30,39 @@ void Case::setCristal(bool cristal)
     this->display();
 }
 
+void Case::setDirection(unsigned int personnage_direction)
+{
+    this->personnage_direction = personnage_direction;
+    this->display();
+}
+
+void Case::reset()
+{
+    personnage = start_personnage;
+    cristal = start_cristal;
+    this->display();
+}
+
 void Case::display()
 {
+
     if(this->havePersonnage()){
         this->setScaledContents( true );
         this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/personnage.png"));
-        this->update();
+        QPixmap pix("images/personnage.png");
+        QTransform transform;
+        transform.rotate(personnage_direction*90);
+        QPixmap rotatedPixelFrame = pix.transformed(transform);
+        this->setPixmap(rotatedPixelFrame);
+        this->repaint();
     } else if(this->haveCristal()){
         this->setScaledContents( true );
         this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
         this->setPixmap(QPixmap("images/cristal.png"));
-        this->update();
+        this->repaint();
     } else {
         this->setPixmap(QPixmap());
-        this->update();
+        this->repaint();
     }
 }
 
