@@ -10,8 +10,8 @@ Detection::Detection()
 
     dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
 
-    vector_argument = {11,14};
-    vector_function = {13,10};
+    vector_argument = {11,14,4};
+    vector_function = {13,10, 9, 8, 7};
 
 }
 
@@ -24,6 +24,8 @@ void Detection::launch(){
     while (inputVideo.grab())
     {
         cv::Mat image, imageCopy;
+        std::vector<int> ids;
+        std::vector<std::vector<Point2f> > corners;
         inputVideo.retrieve(image);
         double angle = 90;
         image = rotateImage(image, angle);
@@ -31,26 +33,31 @@ void Detection::launch(){
         image.copyTo(imageCopy);
 
         cv::aruco::detectMarkers(image, dictionary, corners, ids);
-        this->ids = ids;
-        this->corners = corners;
-        affinedCorners = affinageCorners();  //  permet d'annuler l'effet de scintillement
-        affinedIds = affinageIds();  //  pareil
+        affinedCorners = affinageCorners(corners);  //  permet d'annuler l'effet de scintillement
+        affinedIds = affinageIds(ids);  //  pareil
         sortedIds = sortTrackers(); //  range les ids de haut en bas selon l'image
 
         cartes.clear();
+
         //  cree des objets carte dans le vector cartes
         for(unsigned int i = 0; i<sortedIds.size(); i++){
             if (std::find(vector_argument.begin(), vector_argument.end(),sortedIds.at(i))!=vector_argument.end())
-                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i)), "argument"));
+                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids), "argument"));
             else if (std::find(vector_function.begin(), vector_function.end(),sortedIds.at(i))!=vector_function.end())
-                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i)), "function"));
-            else cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i))));
+                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids), "function"));
+            else cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids)));
         }
 
         detectOptions();
 
         //  checkStartGoal permet d'avoir la condition de lancement de maniere fiable
         if(checkStartGoal()){
+            manyGoalChecked.clear();
+            manyGoalChecked2.clear();
+            manyCorners.clear();
+            manyIds.clear();
+            final_cartes = cartes;
+            cartes.clear();
             break;
         }
 
@@ -67,9 +74,10 @@ void Detection::launch(){
 }
 
 
+
 std::vector<Carte*> Detection::getCartes()
 {
-    return this->cartes;
+    return this->final_cartes;
 }
 
 std::vector<int> Detection::sortTrackers()
@@ -102,17 +110,17 @@ std::vector<int> Detection::sortTrackers()
 }
 
 
-cv::Point2f Detection::getXY(int const id)
+cv::Point2f Detection::getXY(int const id, std::vector<std::vector<Point2f> > const &corners, std::vector<int> const &ids)
 {
 
     Point2f coordonnees;
     //pour avoir la position de l'id dans le vector
-    for (unsigned int i = 0; i < this->ids.size(); i++)
+    for (unsigned int i = 0; i < ids.size(); i++)
     {
 
-        if (this->ids.at(i) == id)
+        if (ids.at(i) == id)
         {
-            coordonnees = getCenter(this->corners.at(i));
+            coordonnees = getCenter(corners.at(i));
             break;
         }
     }
@@ -181,12 +189,12 @@ bool Detection::checkStartGoal(){
  * alors sur 20 frame on sort le tableau possedant le plus de cartes, car c'est surement le plus vrai
  *
 */
-std::vector<int> Detection::affinageIds(){
+std::vector<int> Detection::affinageIds(std::vector<int> const &input){
     std::vector<int> tampon;
-    manyIds.push_back(ids);
+    manyIds.push_back(input);
 
     //  limite la taille du vector
-    if(manyIds.size() >=20){
+    if(manyIds.size() >=10){
         manyIds.erase(manyIds.begin());
     }
 
@@ -202,13 +210,13 @@ std::vector<int> Detection::affinageIds(){
     return manyIds.at(0);
 }
 
-std::vector<std::vector<cv::Point2f>> Detection::affinageCorners(){
+std::vector<std::vector<cv::Point2f>> Detection::affinageCorners(std::vector<std::vector<cv::Point2f> > const &input){
     std::vector<int> tampon;
 
-    manyCorners.push_back(corners);
+    manyCorners.push_back(input);
 
     //  limite la taille
-    if(manyCorners.size() >=20){
+    if(manyCorners.size() >=10){
         manyCorners.erase(manyCorners.begin());
     }
 

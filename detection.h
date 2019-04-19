@@ -18,9 +18,11 @@ class Detection
 {
 
     private:
+
         std::vector<Carte*> cartes;
-        std::vector<int> ids, affinedIds, sortedIds, vector_argument, vector_function;
-        std::vector<std::vector<cv::Point2f>> corners, affinedCorners;
+        std::vector<Carte*> final_cartes;
+        std::vector<int> affinedIds, sortedIds, vector_argument, vector_function;
+        std::vector<std::vector<cv::Point2f>> affinedCorners;
         cv::VideoCapture inputVideo;
         cv::Ptr<cv::aruco::Dictionary> dictionary;
         std::vector<bool> manyGoalChecked, manyGoalChecked2;
@@ -28,11 +30,11 @@ class Detection
         std::vector<std::vector<std::vector<cv::Point2f>>> manyCorners;
 
 
-        cv::Point2f getXY(int const id);
-        std::vector<int> affinageIds();
+        cv::Point2f getXY(int const id, std::vector<std::vector<cv::Point2f>> const &corners, std::vector<int> const &ids);
+        std::vector<int> affinageIds(std::vector<int> const &input);
+        std::vector<std::vector<cv::Point2f>> affinageCorners(std::vector<std::vector<cv::Point2f>> const &input);
         bool affinageStartGoal();
         bool checkStartGoal();
-        std::vector<std::vector<cv::Point2f>> affinageCorners();
         cv::Point2f getCenter(std::vector<cv::Point2f> const &input);
         std::vector<int> sortTrackers();
         void detectOptions();
