@@ -25,14 +25,14 @@ GameWindow::GameWindow() : QWidget()
         std::vector<Case*> vector;
         for(unsigned int j = 0; j < lim_x; j++){
 
+            //  si les coord de debut du personnage corresponde a i et j, alors cette case commence avec le personnage
             if(i == personnage->getY() && j == personnage->getX()){
-                vector.push_back(new Case(true, false));
+                vector.push_back(new Case(true, personnage_direction, false, false));
 
                 grid_right->addWidget(vector.at(j), i, j);
             }
-
             else {
-                vector.push_back(new Case(false, false));
+                vector.push_back(new Case(false, personnage_direction, false, false));
 
                 grid_right->addWidget(vector.at(j), i, j);
             }
@@ -57,8 +57,6 @@ GameWindow::GameWindow() : QWidget()
     this->controller = new Controller(personnage,cases,detection);
     this->controller->setLabels(labels);
 
-
-
     grid_main->addLayout(grid_left, 0,0,1,1,0);
     grid_main->addLayout(grid_right, 0,1,2,2,0);
     this->setLayout(grid_main);
@@ -76,6 +74,6 @@ GameWindow::~GameWindow()
 //  s'execute quand on appuie sur le clavier
 void GameWindow::keyPressEvent(QKeyEvent *event)
 {
-    controller->controlCartes();
-//    this->controller->keyPressEvent(event);
+//    controller->controlCartes();
+    this->controller->keyPressEvent(event);
 }
