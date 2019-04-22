@@ -19,106 +19,97 @@ void Controller::controlCartes()
         detection->launch();
         std::vector<Carte*> cartes = detection->getCartes();
         displayFunctions(cartes);
-        unsigned int loop=1;        //  nombre de tours precise par l'argument
-        unsigned int loop_begin=1;    //  sert a savoir ou le boucle commence
-        unsigned int loop_i=1;      //  iterateur de la boucle
-        unsigned int loop_current_carte=0;
-        unsigned int loop_current_carte_i=1;
-        for(unsigned int i = 1; i<cartes.size()-1;i++){
-            usleep(400000);
-
-            // pour avoir en memoire la position du personnage avant le mouvement
-            int x = personnage->getX();
-            int y = personnage->getY();
-
-            //  debut loop
-            if(cartes.at(i)->getId() == 9){
-                loop_begin = i;
-                if(cartes.at(i)->getArgumentId()==11)
-                    loop = 2;
-                else if(cartes.at(i)->getArgumentId()==14)
-                    loop = 3;
-                else if(cartes.at(i)->getArgumentId()==4)
-                    loop = 4;
-                else loop = 1;
-
+        movePersonnage(cartes, 0);
+        usleep(500000);
+        bool checkWin=true;
+        for(unsigned int i=0; i<cases.size();i++){
+            for(unsigned int j=0; j<cases.at(i).size();j++){
+                if(cases.at(i).at(j)->isCristal()) checkWin=false;
             }
+        }
+        if(checkWin) break;
+        this->resetPlateau();
 
-            //  fin loop
-            else if(cartes.at(i)->getId() == 8){
-                //  si le nb de tour precise par l'arg n'a pas ete atteint
-                if(loop_i != loop){
-                    loop_i++;
-                    i = loop_begin;
-                }
+
+    }
+}
+
+
+
+void Controller::movePersonnage(std::vector<Carte*> cartes, unsigned int loop_begin)
+{
+    for(unsigned int i = loop_begin; i<cartes.size();i++){
+        usleep(400000);
+
+        // pour avoir en memoire la position du personnage avant le mouvement
+        int x = personnage->getX();
+        int y = personnage->getY();
+
+        //  debut loop
+        if(cartes.at(i)->getId() == 9){
+            loop_begin = i;
+
+            if(cartes.at(i)->getArgumentId()==11){
+                for(unsigned int j=0; j<2;j++) movePersonnage(cartes, loop_begin);
             }
-
-            //  avancer
-            else if(cartes.at(i)->getId() == 13){
-                personnage->avancer();
-                if(cartes.at(i)->getArgumentId()==11)
-                    loop_current_carte = 2;
-                else if(cartes.at(i)->getArgumentId()==14)
-                    loop_current_carte = 3;
-                else if(cartes.at(i)->getArgumentId()==4)
-                    loop_current_carte = 4;
-                else loop_current_carte = 1;
-
-                if(loop_current_carte_i != loop_current_carte){
-                    i--; //on recommence ce tour
-                    loop_current_carte_i++;
-                }else{
-                    loop_current_carte=0;
-                    loop_current_carte_i = 1;
-                }
-
+            else if(cartes.at(i)->getArgumentId()==14){
+                for(unsigned int j=0; j<3;j++) movePersonnage(cartes, loop_begin);
             }
-
-            //  tourner a droite
-            else if(cartes.at(i)->getId() == 7)
-            {
-                personnage->tourner_droite();
-
-                if(cartes.at(i)->getArgumentId()==11)
-                    loop_current_carte = 2;
-                else loop_current_carte = 1;
-
-                if(loop_current_carte_i != loop_current_carte){
-                    i--; //on recommence ce tour
-                    loop_current_carte_i++;
-                }else{
-                    loop_current_carte=0;
-                    loop_current_carte_i = 1;
-                }
+            else if(cartes.at(i)->getArgumentId()==4){
+                for(unsigned int j=0; j<4;j++) movePersonnage(cartes, loop_begin);
             }
+            movePersonnage(cartes, loop_begin+1);
 
-            //  tourner a gauche
-            else if(cartes.at(i)->getId() == 10)
-            {
-                personnage->tourner_gauche();
-
-                if(cartes.at(i)->getArgumentId()==11)
-                    loop_current_carte = 2;
-                else loop_current_carte = 1;
-
-                if(loop_current_carte_i != loop_current_carte){
-                    i--; //on recommence ce tour
-                    loop_current_carte_i++;
-                }else{
-                    loop_current_carte=0;
-                    loop_current_carte_i = 1;
-                }
+        }
+        //  fin loop
+        else if(cartes.at(i)->getId() == 8){
+            break;
+        }
+        //  avancer
+        else if(cartes.at(i)->getId() == 13){
+            personnage->avancer();
+            if(cartes.at(i)->getArgumentId()==11){
+                for(unsigned int j=0; j<1;j++) movePersonnage(cartes, i--);
+            }
+            else if(cartes.at(i)->getArgumentId()==14){
+                for(unsigned int j=0; j<2;j++) movePersonnage(cartes, i--);
+            }
+            else if(cartes.at(i)->getArgumentId()==4){
+                for(unsigned int j=0; j<3;j++) movePersonnage(cartes, i--);
             }
 
 
             //changement de la case ou le perso etait ainsi que celle ou il va
-            this->cases.at(y).at(x)->setPersonnage(false); // setPersonnage repaint aussi la case
-            this->cases.at(personnage->getY()).at(personnage->getX())->setDirection(personnage->getDirection()); // pareil
+            this->cases.at(y).at(x)->setPersonnage(false); // setPersonnage repaint la case en meme temps
+            this->cases.at(personnage->getY()).at(personnage->getX())->setDirection(personnage->getDirection());
             this->cases.at(personnage->getY()).at(personnage->getX())->setPersonnage(true);
         }
-        usleep(500000);
-        this->resetPlateau();
+        //  tourner a droite
+        else if(cartes.at(i)->getId() == 7)
+        {
+            personnage->tourner_droite();
+            if(cartes.at(i)->getArgumentId()==11)
+            {
+                for(unsigned int j=0; j<1;j++) movePersonnage(cartes, i--);
+            }
+            this->cases.at(personnage->getY()).at(personnage->getX())->setDirection(personnage->getDirection());
+        }
 
+        //  tourner a gauche
+        else if(cartes.at(i)->getId() == 10)
+        {
+            personnage->tourner_gauche();
+            if(cartes.at(i)->getArgumentId()==11){
+                for(unsigned int j=0; j<1;j++) movePersonnage(cartes, i--);
+            }
+            this->cases.at(personnage->getY()).at(personnage->getX())->setDirection(personnage->getDirection());
+
+        }
+        //  interagir
+        else if(cartes.at(i)->getId() == 12)
+        {
+            this->cases.at(personnage->getY()).at(personnage->getX())->setCristal(false);
+        }
     }
 }
 
@@ -133,7 +124,7 @@ void Controller::resetPlateau()
     }
 }
 
-
+//  pour afficher les fonctions dans l'ordre des cartes
 void Controller::displayFunctions(std::vector<Carte*> cartes)
 {
     //  boucle pour nettoyer les textes
@@ -158,8 +149,48 @@ void Controller::displayFunctions(std::vector<Carte*> cartes)
     }
 }
 
+//  pour recuperer les labels a modifier
 void Controller::setLabels(std::vector<std::vector<QLabel*>> labels){
     this->labels = labels;
 }
+
+
+//  utile pour tester sans les trackers
+void Controller::controlKeys(std::vector<Carte*> cartes)
+{
+    while(1){
+        displayFunctions(cartes);
+        movePersonnage(cartes, 0);
+        usleep(500000);
+        this->resetPlateau();
+
+    }
+}
+
+//  utile pour tester sans les trackers
+void Controller::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()==Qt::Key_S)
+        cartes.push_back(new Carte(16,"function"));
+    else if(event->key()==Qt::Key_G)
+        cartes.push_back(new Carte(15,"function"));
+    else if(event->key()==Qt::Key_Up)
+        cartes.push_back(new Carte(13,"function"));
+    else if(event->key()==Qt::Key_Left)
+        cartes.push_back(new Carte(10,"function"));
+    else if(event->key()==Qt::Key_Right)
+        cartes.push_back(new Carte(7,"function"));
+    else if(event->key()==Qt::Key_I)
+        cartes.push_back(new Carte(12,"function"));
+    else if(event->key()==Qt::Key_L)
+        cartes.push_back(new Carte(9,"function"));
+    else if(event->key()==Qt::Key_M)
+        cartes.push_back(new Carte(8,"function"));
+    else if(event->key()==Qt::Key_Backspace)
+        controlKeys(cartes);
+
+
+}
+
 
 
