@@ -24,6 +24,8 @@ public:
 
     Carte(int id, cv::Point2f xy);
     Carte(int id, cv::Point2f coord, std::string type);
+    Carte(int id, std::string type);
+
     void setArgumentId(int const argument_id);
     int getId();
     int getX();

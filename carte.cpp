@@ -26,6 +26,19 @@ Carte::Carte(int id, cv::Point2f coord, std::string type)
 
 }
 
+
+Carte::Carte(int id, std::string type)
+{
+
+    this->id = id;
+    this->type = type;
+    x = 0;
+    y = 0;
+    argument_id = -1;
+    setName(id);
+
+}
+
 void Carte::setArgumentId(int argument_id)
 {
     this->argument_id = argument_id;
@@ -48,12 +61,6 @@ void Carte::setName(int id)
         name = QString("Debut de Boucle");
     else if(id==8)
         name = QString("Fin de Boucle");
-//    else if(id==14)
-//        name = QString("x3");
-//    else if(id==4)
-//        name = QString("x4");
-//    else if(id==11)
-//        name = QString("x2");
 
 }
 
