@@ -1,8 +1,5 @@
 #include "detection.h"
 
-using namespace std;
-using namespace cv;
-
 Detection::Detection()
 {
     inputVideo.open(0);
@@ -25,9 +22,9 @@ void Detection::launch(){
     {
         cv::Mat image, imageCopy;
         std::vector<int> ids;
-        std::vector<std::vector<Point2f> > corners;
+        std::vector<std::vector<cv::Point2f> > corners;
         inputVideo.retrieve(image);
-        double angle = 90;
+        double const angle = 90;
         image = rotateImage(image, angle);
 
         image.copyTo(imageCopy);
@@ -110,10 +107,10 @@ std::vector<int> Detection::sortTrackers()
 }
 
 
-cv::Point2f Detection::getXY(int const id, std::vector<std::vector<Point2f> > const &corners, std::vector<int> const &ids)
+cv::Point2f Detection::getXY(int const id, std::vector<std::vector<cv::Point2f> > const &corners, std::vector<int> const &ids)
 {
 
-    Point2f coordonnees;
+    cv::Point2f coordonnees;
     //pour avoir la position de l'id dans le vector
     for (unsigned int i = 0; i < ids.size(); i++)
     {
@@ -124,9 +121,6 @@ cv::Point2f Detection::getXY(int const id, std::vector<std::vector<Point2f> > co
             break;
         }
     }
-
-    //  le deuxieme at() selectionne le coin du tracker
-    //  1 pour haut gauche, 2 pour haut droite, etc
     return coordonnees;
 }
 
@@ -135,7 +129,7 @@ cv::Point2f Detection::getCenter(std::vector<cv::Point2f> const &input)
 
     int milieu_x = input.at(0).x + input.at(1).x + input.at(2).x + input.at(3).x;
     int milieu_y = input.at(0).y + input.at(1).y + input.at(2).y + input.at(3).y;
-    Point2f center(milieu_x / 4, milieu_y / 4);
+    cv::Point2f center(milieu_x / 4, milieu_y / 4);
 
     return center;
 }
