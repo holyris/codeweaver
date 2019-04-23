@@ -25,15 +25,18 @@ private:
     Detection *detection;
     void resetPlateau();
     void displayFunctions(std::vector<Carte*> cartes);
-    void movePersonnage(std::vector<Carte*> cartes, unsigned int i);
+    void controlPersonnage(std::vector<Carte*> cartes, unsigned int loop_begin, unsigned int marqueur);
+    void movePersonnage(std::string movement);
     void controlKeys(std::vector<Carte*> cartes);
+    bool checkAvancer();
 
 public:
-    Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases, Detection *detection);
+    Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases);
     ~Controller();
     void controlCartes();
     void setLabels(std::vector<std::vector<QLabel*>> labels);
     void keyPressEvent(QKeyEvent* event);
+
 
 };
 
