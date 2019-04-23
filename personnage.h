@@ -12,7 +12,7 @@ private:
 
 
 public:
-    Personnage(unsigned int x, unsigned int y, int direction, unsigned int lim_x, unsigned int lim_y);
+    Personnage(unsigned int x, unsigned int y, int direction);
     ~Personnage();
     unsigned int getX();
     unsigned int getY();

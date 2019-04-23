@@ -1,6 +1,6 @@
 #include "personnage.h"
 
-Personnage::Personnage(unsigned int x, unsigned int y,int direction, unsigned int lim_x, unsigned int lim_y)
+Personnage::Personnage(unsigned int x, unsigned int y,int direction)
 {
     this->x = x;
     this->y = y;
@@ -8,8 +8,6 @@ Personnage::Personnage(unsigned int x, unsigned int y,int direction, unsigned in
     this->start_x = x;
     this->start_y = y;
     this->start_direction = direction;
-    this->lim_x = lim_x;
-    this->lim_y = lim_y;
 }
 
 Personnage::~Personnage()
@@ -20,26 +18,21 @@ void Personnage::avancer()
 {
 
         //avance en haut
-        if(this->direction == 0){
-            //  pour eviter de sortir des limites
-            if(y!=0)
-                this->y--;
-        }
+        if(this->direction == 0)
+            this->y--;
+
         //avance a droite
-        else if(this->direction == 1){
-            if(x!=lim_x-1)
-                this->x++;
-        }
+        else if(this->direction == 1)
+            this->x++;
+
         //avance en bas
-        else if(this->direction == 2){
-            if(y!=lim_y-1)
-                this->y++;
-        }
+        else if(this->direction == 2)
+            this->y++;
+
         //avance a gauche
-        else if (this->direction == 3){
-            if(x!=0)
-                this->x--;
-        }
+        else if (this->direction == 3)
+            this->x--;
+
 
 }
 
