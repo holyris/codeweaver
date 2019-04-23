@@ -1,8 +1,5 @@
 #include "carte.h"
 
-using namespace std;
-using namespace cv;
-
 Carte::Carte(int id, cv::Point2f coord)
 {
 
@@ -61,6 +58,8 @@ void Carte::setName(int id)
         name = QString("Debut de Boucle");
     else if(id==8)
         name = QString("Fin de Boucle");
+    else if(id==0)
+        name = QString("Interagir");
 
 }
 
@@ -71,6 +70,8 @@ void Carte::setArgumentName(int id){
         argument_name = QString("x3");
     else if(id == 11)
         argument_name = QString("x2");
+    else if(id == 5)
+        argument_name = QString("x5");
 
 }
 int Carte::getArgumentId()
