@@ -13,7 +13,7 @@ private:
     bool cristal;
     bool personnage;
     unsigned int personnage_direction;
-    bool mur;       // une case reste toujours en mur donc il n'ya pas de start_mur
+    bool plateforme;       // une case reste toujours en plateforme donc il n'ya pas de start_plateforme
     bool start_personnage;
     bool start_cristal;
     unsigned int start_personnage_direction;
@@ -30,7 +30,7 @@ public:
     void reset();
     bool isPersonnage();
     bool isCristal();
-    bool isMur();
+    bool isPlateforme();
 
 };
 

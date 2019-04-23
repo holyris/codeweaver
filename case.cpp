@@ -4,12 +4,12 @@ Case::Case()
 {
 
 }
-Case::Case(bool personnage, unsigned int personnage_direction, bool cristal, bool mur): QLabel()
+Case::Case(bool personnage, unsigned int personnage_direction, bool cristal, bool plateforme): QLabel()
 {
     this->personnage = personnage;
     this->cristal = cristal;
     this->personnage_direction = personnage_direction;
-    this->mur = mur;
+    this->plateforme = plateforme;
     this->start_personnage = personnage;
     this->start_cristal = cristal;
     this->start_personnage_direction = personnage_direction;
@@ -53,20 +53,28 @@ void Case::reset()
 //  affiche en fonction de l'etat de la case
 void Case::display()
 {
-    if(this->isPersonnage()){
+
+    if(isPersonnage()){
         this->setScaledContents( true );
         this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        QPixmap pix("images/personnage.png");
+        QPixmap pix("images/plateforme+perso.png");
         QTransform transform;
         transform.rotate(personnage_direction*90);
         QPixmap rotatedPixelFrame = pix.transformed(transform);
         this->setPixmap(rotatedPixelFrame);
         this->repaint();
-    } else if(this->isCristal()){
+        this->repaint();
+    } else if(isCristal()){
         this->setScaledContents( true );
         this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/cristal.png"));
+        this->setPixmap(QPixmap("images/plateforme+cristal.png"));
         this->repaint();
+    } else if(isPlateforme()){
+        this->setScaledContents( true );
+        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        this->setPixmap(QPixmap("images/plateforme.png"));
+        this->repaint();
+
     } else {
         this->setPixmap(QPixmap());
         this->repaint();
@@ -77,10 +85,15 @@ void Case::display()
 
 bool Case::isPersonnage()
 {
-    return this->personnage;
+    return personnage;
 }
 
 bool Case::isCristal()
 {
-    return this->cristal;
+    return cristal;
+}
+
+bool Case::isPlateforme()
+{
+    return plateforme;
 }
