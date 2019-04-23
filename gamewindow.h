@@ -15,7 +15,6 @@ class GameWindow : public QWidget
 
 private:
     Controller *controller;
-    Detection *detection;
 
     void keyPressEvent(QKeyEvent *event);
 
