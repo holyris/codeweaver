@@ -6,9 +6,7 @@ Detection::Detection()
 //    inputVideo.set(CV_CAP_PROP_FPS, 10);
 
     dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-
-    vector_argument = {11,14,4};
-    vector_function = {13,10, 9, 8, 7};
+    frame = 0;
 
 }
 
@@ -17,46 +15,52 @@ Detection::~Detection()
     cartes.clear();
 }
 
-void Detection::launch(){
+std::vector<Carte*> Detection::launch(){
     while (inputVideo.grab())
     {
+        std::vector<int> const vector_argument = {11,14,4,5,6};
+        std::vector<int> const vector_function = {13,10, 9, 7};
+
         cv::Mat image, imageCopy;
-        std::vector<int> ids;
-        std::vector<std::vector<cv::Point2f> > corners;
+        std::vector<int> ids, affinedIds;
+        std::vector<std::vector<cv::Point2f> > corners, affinedCorners, sortedCorners;
         inputVideo.retrieve(image);
         double const angle = 90;
         image = rotateImage(image, angle);
-
         image.copyTo(imageCopy);
 
         cv::aruco::detectMarkers(image, dictionary, corners, ids);
         affinedCorners = affinageCorners(corners);  //  permet d'annuler l'effet de scintillement
         affinedIds = affinageIds(ids);  //  pareil
-        sortedIds = sortTrackers(); //  range les ids de haut en bas selon l'image
-
+        sortedIds = sortTrackers(affinedCorners, affinedIds); //  range les ids de haut en bas selon l'image
+        sortedCorners = sortCorners(affinedCorners);
         cartes.clear();
 
         //  cree des objets carte dans le vector cartes
         for(unsigned int i = 0; i<sortedIds.size(); i++){
             if (std::find(vector_argument.begin(), vector_argument.end(),sortedIds.at(i))!=vector_argument.end())
-                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids), "argument"));
+                cartes.push_back(new Carte(sortedIds.at(i), getCenter(sortedCorners.at(i)), "argument"));
             else if (std::find(vector_function.begin(), vector_function.end(),sortedIds.at(i))!=vector_function.end())
-                cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids), "function"));
-            else cartes.push_back(new Carte(sortedIds.at(i), getXY(sortedIds.at(i), corners, ids)));
+                cartes.push_back(new Carte(sortedIds.at(i), getCenter(sortedCorners.at(i)), "function"));
+            else cartes.push_back(new Carte(sortedIds.at(i), getCenter(sortedCorners.at(i))));
         }
 
         detectOptions();
-
-        //  checkStartGoal permet d'avoir la condition de lancement de maniere fiable
-        if(checkStartGoal()){
-            manyGoalChecked.clear();
-            manyGoalChecked2.clear();
-            manyCorners.clear();
-            manyIds.clear();
-            final_cartes = cartes;
-            cartes.clear();
-            break;
+        frame++;
+        if(frame == 30 /*&& affinedIds.size() > 0*/){
+            frame = 0;
+            return cartes;
         }
+//        //  checkStartGoal permet d'avoir la condition de lancement de maniere fiable
+//        if(checkStartGoal()){
+//            manyGoalChecked.clear();
+//            manyGoalChecked2.clear();
+//            manyCorners.clear();
+//            manyIds.clear();
+//            final_cartes = cartes;
+//            cartes.clear();
+//            break;
+//        }
 
         // if at least one marker detected
 //        if (ids.size() > 0)
@@ -64,9 +68,9 @@ void Detection::launch(){
 //            cv::aruco::drawDetectedMarkers(imageCopy, corners, ids);
 //        }
 //        cv::imshow("out", imageCopy);
-        char key = (char)cv::waitKey(10);
-        if (key == 27)
-            break;
+//        char key = (char)cv::waitKey(10);
+//        if (key == 27)
+//            break;
     }
 }
 
@@ -77,7 +81,9 @@ std::vector<Carte*> Detection::getCartes()
     return this->final_cartes;
 }
 
-std::vector<int> Detection::sortTrackers()
+
+
+std::vector<int> Detection::sortTrackers(const std::vector<std::vector<cv::Point2f> > &affinedCorners, std::vector<int> const &affinedIds)
 {
     std::vector<int> vect_y;
     std::vector<int> sortedIds;
@@ -91,7 +97,6 @@ std::vector<int> Detection::sortTrackers()
     // donc du plus petit au plus grand y
     for (int i = 0; i < vect_y.size(); i++)
     {
-
         //si l'element est le plus grand du vector, alors push l'id ayant cette position (les coordonnees sont rangees dans le meme ordre que les ids)
         if (vect_y.at(i) == *max_element(vect_y.begin(), vect_y.end()) && vect_y.at(i) != -1)
         {
@@ -106,23 +111,33 @@ std::vector<int> Detection::sortTrackers()
     return sortedIds;
 }
 
-
-cv::Point2f Detection::getXY(int const id, std::vector<std::vector<cv::Point2f> > const &corners, std::vector<int> const &ids)
+std::vector<std::vector<cv::Point2f> > Detection::sortCorners(const std::vector<std::vector<cv::Point2f> > &input)
 {
+    std::vector<std::vector<cv::Point2f>> sortedCorners;
+    std::vector<int> vect_y;
+    for (unsigned int i = 0; i < input.size(); i++)
+        vect_y.push_back(getCenter(input.at(i)).y); //prend le y du centre
 
-    cv::Point2f coordonnees;
-    //pour avoir la position de l'id dans le vector
-    for (unsigned int i = 0; i < ids.size(); i++)
+
+
+    // cette boucle permet de mettre dans sortedCorners les coord des trackers mais tries de haut en bas selon l'image
+    // donc du plus petit au plus grand y
+    for (int i = 0; i < vect_y.size(); i++)
     {
-
-        if (ids.at(i) == id)
+        //si l'element est le plus grand du vector, alors push les coord
+        if (vect_y.at(i) == *max_element(vect_y.begin(), vect_y.end()) && vect_y.at(i) != -1)
         {
-            coordonnees = getCenter(corners.at(i));
-            break;
+            sortedCorners.push_back(input.at(i));
+            vect_y.at(i) = -1; // on met a -1 pour eviter que max_element le trouve et que la boucle recommence
+
+            i = -1; // on recommence la boucle pour revenir au debut du vector
+
         }
     }
-    return coordonnees;
+    std::reverse(sortedCorners.begin(), sortedCorners.end()); //c'est range de maniere decroissante à la base
+    return sortedCorners;
 }
+
 
 cv::Point2f Detection::getCenter(std::vector<cv::Point2f> const &input)
 {
@@ -141,7 +156,7 @@ bool Detection::affinageStartGoal(){
     if(!sortedIds.empty()){
         check = true;
         //  si l'element tout en bas est goal et que celui tout en haut est start alors push true
-        if(sortedIds.back() == 15 && sortedIds.at(0) == 16)
+        if(sortedIds.back() == 15)
             manyGoalChecked.push_back(true);
         else
             manyGoalChecked.push_back(false);
@@ -180,7 +195,7 @@ bool Detection::checkStartGoal(){
 
 /*
  * quand on cherche l'ordre des cartes sur l'image, il arrive que certaines ne soient pas captées
- * alors sur 20 frame on sort le tableau possedant le plus de cartes, car c'est surement le plus vrai
+ * alors sur 10 frame on sort le tableau possedant le plus de cartes, car c'est surement le plus vrai
  *
 */
 std::vector<int> Detection::affinageIds(std::vector<int> const &input){
@@ -238,13 +253,19 @@ void Detection::detectOptions()
                 //cherche uniquement les cartes argument
                 if(cartes.at(j)->getType() == "argument"){
 
-
                     // verif si yen a une a droite
                     if(cartes.at(i)->getX() < cartes.at(j)->getX() && cartes.at(j)->getX() <= cartes.at(i)->getX()+100){
                         // verif si c'est a peu pres a la meme hauteur
                         if(cartes.at(j)->getY() <= cartes.at(i)->getY()+30 && cartes.at(j)->getY() >= cartes.at(i)->getY()-30){
-                            cartes.at(i)->setArgumentId(cartes.at(j)->getId());
-                            break;
+
+                            //ce if permet de ne pas attribuer autre chose que x2 pour tourner droite et gauche
+                            if(cartes.at(i)->getId() != 10 && cartes.at(i)->getId() != 7){
+                                cartes.at(i)->setArgumentId(cartes.at(j)->getId());
+                                break;
+                            } else if(cartes.at(j)->getId() ==11 ){
+                                cartes.at(i)->setArgumentId(cartes.at(j)->getId());
+                                break;
+                            }
                         }
                     }
                 }

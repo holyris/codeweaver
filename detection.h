@@ -18,32 +18,30 @@ class Detection
 {
 
     private:
-
+        int frame;
         std::vector<Carte*> cartes;
         std::vector<Carte*> final_cartes;
-        std::vector<int> affinedIds, sortedIds, vector_argument, vector_function;
-        std::vector<std::vector<cv::Point2f>> affinedCorners;
+        std::vector<int> sortedIds;
         cv::VideoCapture inputVideo;
         cv::Ptr<cv::aruco::Dictionary> dictionary;
         std::vector<bool> manyGoalChecked, manyGoalChecked2;
         std::vector<std::vector<int>> manyIds;
         std::vector<std::vector<std::vector<cv::Point2f>>> manyCorners;
 
-
-        cv::Point2f getXY(int const id, std::vector<std::vector<cv::Point2f>> const &corners, std::vector<int> const &ids);
         std::vector<int> affinageIds(std::vector<int> const &input);
+        std::vector<int> sortTrackers(std::vector<std::vector<cv::Point2f>> const &affinedCorners, std::vector<int> const &affinedIds);
         std::vector<std::vector<cv::Point2f>> affinageCorners(std::vector<std::vector<cv::Point2f>> const &input);
+        std::vector<std::vector<cv::Point2f>> sortCorners(std::vector<std::vector<cv::Point2f>> const &input);
+        cv::Point2f getCenter(std::vector<cv::Point2f> const &input);
         bool affinageStartGoal();
         bool checkStartGoal();
-        cv::Point2f getCenter(std::vector<cv::Point2f> const &input);
-        std::vector<int> sortTrackers();
         void detectOptions();
         cv::Mat rotateImage(cv::Mat image, double angle);
 
     public:
         Detection();
         ~Detection();
-        void launch();
+        std::vector<Carte*> launch();
         std::vector<Carte*> getCartes();
 
 
