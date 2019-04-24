@@ -2,9 +2,9 @@
 
 GameWindow::GameWindow() : QWidget()
 {
-    char const plateformes[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
-    char const cristaux[8] = {0,0,8,20,8,0,0,0};
-    unsigned int personnage_x=2, personnage_y=3, personnage_direction=1;
+char const plateformes[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
+char const cristaux[8] = {0,0,2,8,20,8,32,0};
+unsigned int personnage_x=3, personnage_y=4, personnage_direction=1;
 
     std::vector<std::vector<Case*>> cases;
     Personnage *personnage = new Personnage(personnage_x, personnage_y, personnage_direction);
@@ -32,12 +32,12 @@ GameWindow::GameWindow() : QWidget()
 
                 grid_right->addWidget(vector.at(j), i, j);
             }
-            else if((cristaux[i] >> j) & 1 ==1 ){
+            else if(((cristaux[i] >> j) & 1) ==1 ){
                 vector.push_back(new Case(false, personnage_direction, true, true));
 
                 grid_right->addWidget(vector.at(j), i, j);
             }
-            else if((plateformes[i] >> j) & 1 == 1 ){
+            else if(((plateformes[i] >> j) & 1) == 1 ){
                 vector.push_back(new Case(false, personnage_direction, false, true));
 
                 grid_right->addWidget(vector.at(j), i, j);
@@ -85,6 +85,6 @@ GameWindow::~GameWindow()
 //  s'execute quand on appuie sur le clavier
 void GameWindow::keyPressEvent(QKeyEvent *event)
 {
-//    controller->controlCartes();
-    this->controller->keyPressEvent(event);
+    controller->controlCartes();
+//    this->controller->keyPressEvent(event);
 }
