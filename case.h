@@ -21,9 +21,8 @@ private:
 
 public:
     Case();
-    Case(bool personnage, unsigned int personnage_direction, bool cristal, bool mur);
-
     ~Case();
+    void set(bool personnage, unsigned int personnage_direction, bool cristal, bool plateforme);
     void setPersonnage(bool personnage);
     void setCristal(bool cristal);
     void setDirection(unsigned int personnage_direction);

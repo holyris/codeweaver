@@ -14,14 +14,15 @@
 #include <case.h>
 #include <carte.h>
 #include <detection.h>
+#include <partie.h>
 
 class Controller: QWidget
 {
 private:
     Personnage *personnage;
     std::vector<std::vector<Case*>> cases;
-    std::vector<std::vector<QLabel*>> labels;
-//    std::vector<Carte*> cartes;
+    std::vector<QLabel*> labels;
+    Partie *partie;
     Detection *detection;
     void resetPlateau();
     void displayFunctions(std::vector<Carte*> cartes);
@@ -34,7 +35,7 @@ public:
     Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases);
     ~Controller();
     void controlCartes();
-    void setLabels(std::vector<std::vector<QLabel*>> labels);
+    void setLabels(std::vector<QLabel*> labels);
 //    void keyPressEvent(QKeyEvent* event);
 
 

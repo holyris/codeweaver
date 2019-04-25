@@ -10,6 +10,7 @@
 #include "controller.h"
 #include "detection.h"
 #include "carte.h"
+#include "partie.h"
 class GameWindow : public QWidget
 {
 

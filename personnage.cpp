@@ -1,14 +1,19 @@
 #include "personnage.h"
 
-Personnage::Personnage(unsigned int x, unsigned int y,int direction)
+
+Personnage::Personnage()
 {
-    this->x = x;
-    this->y = y;
-    this->direction = direction;
-    this->start_x = x;
-    this->start_y = y;
-    this->start_direction = direction;
+
 }
+//Personnage::Personnage(unsigned int x, unsigned int y,int direction)
+//{
+//    this->x = x;
+//    this->y = y;
+//    this->direction = direction;
+//    this->start_x = x;
+//    this->start_y = y;
+//    this->start_direction = direction;
+//}
 
 Personnage::~Personnage()
 {
@@ -36,6 +41,15 @@ void Personnage::avancer()
 
 }
 
+void Personnage::set(unsigned int x, unsigned int y, int direction)
+{
+        this->x = x;
+        this->y = y;
+        this->direction = direction;
+        this->start_x = x;
+        this->start_y = y;
+        this->start_direction = direction;
+}
 void Personnage::tourner_droite()
 {
     if(this->direction == 3)

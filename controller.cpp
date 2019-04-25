@@ -5,6 +5,8 @@ Controller::Controller(Personnage *personnage, std::vector<std::vector<Case*>> c
     this->personnage = personnage;
     this->cases = cases;
     this->detection = new Detection();
+    this->partie = new Partie(personnage, cases);
+
 }
 
 Controller::~Controller()
@@ -15,6 +17,7 @@ Controller::~Controller()
 //  fonction pour controler le personnage en fonction des cartes captees
 void Controller::controlCartes()
 {
+    partie->newPartie("easy");
     while(1){
 
         std::vector<Carte*> cartes = detection->launch();
@@ -32,7 +35,8 @@ void Controller::controlCartes()
                         if(cases.at(i).at(j)->isCristal()) checkWin=false;
                     }
                 }
-                if(checkWin) break;
+                if(checkWin) partie->newPartie("easy");
+;
                 this->resetPlateau();
             }
         }
@@ -169,8 +173,9 @@ void Controller::movePersonnage(std::string const movement)
             personnage->avancer();
             //changement de la case ou le perso etait ainsi que celle ou il va
             this->cases.at(y).at(x)->setPersonnage(false); // setPersonnage repaint la case en meme temps
-            this->cases.at(y).at(x)->setCristal(false);
+
             this->cases.at(personnage->getY()).at(personnage->getX())->setDirection(personnage->getDirection());
+            this->cases.at(personnage->getY()).at(personnage->getX())->setCristal(false);
             this->cases.at(personnage->getY()).at(personnage->getX())->setPersonnage(true);
         }
     } else if(movement == "droite"){
@@ -200,35 +205,29 @@ void Controller::displayFunctions(std::vector<Carte*> cartes)
 {
     //  boucle pour nettoyer les textes
     for(unsigned int i = labels.size();i--;){
-        for(unsigned int j = labels.at(i).size();j--;){
-           labels.at(i).at(j)->setText("");
-            if(cartes.empty())
-                labels.at(i).at(j)->repaint();
-
-        }
+        labels.at(i)->setText("");
+        if(cartes.empty())
+            labels.at(i)->repaint();
     }
-    unsigned int j=0;
 
+    unsigned int n=0;
     for(unsigned int i=0; i<cartes.size();i++)
     {
-
         QString string = cartes.at(i)->getName();
         if(cartes.at(i)->getType()!="argument"){
             if(cartes.at(i)->getArgumentId()!=-1){
-//                labels.at(j).at(1)->setText(cartes.at(i)->getArgumentName());
                 string = string+"  -  "+cartes.at(i)->getArgumentName();
             }
-            j++;
-            labels.at(j).at(0)->setText(string);
-            labels.at(j).at(0)->repaint();
-
+            n += 2;
+            labels.at(n)->setText(string);
+            labels.at(n)->repaint();
         }
 
     }
 }
 
 //  pour recuperer les labels a modifier
-void Controller::setLabels(std::vector<std::vector<QLabel*>> labels)
+void Controller::setLabels(std::vector<QLabel*> labels)
 {
     this->labels = labels;
 }

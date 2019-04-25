@@ -12,14 +12,14 @@ private:
 
 
 public:
-    Personnage(unsigned int x, unsigned int y, int direction);
+    Personnage();
     ~Personnage();
     unsigned int getX();
     unsigned int getY();
     unsigned int getDirection();
+    void set(unsigned int x, unsigned int y, int direction);
 
 public slots:
-
     void tourner_droite();
     void tourner_gauche();
     void avancer();

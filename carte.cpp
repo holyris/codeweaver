@@ -51,9 +51,9 @@ void Carte::setName(int id)
     else if(id==13)
         name = QString("Avancer");
     else if(id==10)
-        name = QString("Tourner a gauche");
+        name = QString("Tourner à gauche");
     else if(id==7)
-        name = QString("Tourner a droite");
+        name = QString("Tourner à droite");
     else if(id==9)
         name = QString("Debut de Boucle");
     else if(id==8)
