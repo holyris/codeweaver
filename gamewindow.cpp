@@ -4,12 +4,6 @@ GameWindow::GameWindow() : QWidget()
 {
     srand (time(NULL));
 
-
-
-//    int plateformes[8] = {-1,-1,-1,-1,-1,-1,-1,-1};
-//    int cristaux[8] = {1,0,0,0,0,0,0,0};
-//    unsigned int personnage_x=3, personnage_y=4, personnage_direction=1;
-
     std::vector<std::vector<Case*>> cases;
 
     this->setWindowState(Qt::WindowFullScreen);     //  on met en fullscreen
@@ -38,7 +32,7 @@ GameWindow::GameWindow() : QWidget()
 
     std::vector<QLabel*> labels;
     QFont f("Arial",16);
-    //il est peu probable que le nb de cartes depasse 15
+    //il est peu probable que le nb de cartes depasse 30
     for(unsigned int i = 0; i<30 ; i++){
         labels.push_back(new QLabel(""));
         labels.at(i)->setFont(f);

@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     gamewindow.cpp \
     personnage.cpp \
     controller.cpp \
-    partie.cpp
+    partie.cpp \
+    message.cpp
 
 LIBS += -lopencv_videoio -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_aruco
 #LIBS += -L/home/alexandre/Téléchargements/aruco-3.1.0/aruco_src/lib -laruco
@@ -26,7 +27,8 @@ HEADERS += \
     gamewindow.h \
     personnage.h \
     controller.h \
-    partie.h
+    partie.h \
+    message.h
 
 DISTFILES +=
 

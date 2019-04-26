@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <iostream>
 #include <unistd.h>
 #include <vector>
@@ -15,6 +16,7 @@
 #include <carte.h>
 #include <detection.h>
 #include <partie.h>
+#include <message.h>
 
 class Controller: QWidget
 {
@@ -30,6 +32,7 @@ private:
     void movePersonnage(std::string movement);
     void controlKeys(std::vector<Carte*> cartes);
     bool checkAvancer();
+    bool checkWin(std::vector<std::vector<Case*>> cases);
 
 public:
     Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases);

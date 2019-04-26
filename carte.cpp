@@ -72,6 +72,8 @@ void Carte::setArgumentName(int id){
         argument_name = QString("x2");
     else if(id == 5)
         argument_name = QString("x5");
+    else if(id == 6)
+        argument_name = QString("x6");
 
 }
 int Carte::getArgumentId()

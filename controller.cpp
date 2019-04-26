@@ -28,15 +28,13 @@ void Controller::controlCartes()
                 controlPersonnage(cartes, 0,1);
                 usleep(500000);
 
-                // check si les cristaux sont recuperes
-                bool checkWin=true;
-                for(unsigned int i=0; i<cases.size();i++){
-                    for(unsigned int j=0; j<cases.at(i).size();j++){
-                        if(cases.at(i).at(j)->isCristal()) checkWin=false;
-                    }
+                if(checkWin(cases)){
+                    Message *message = new Message;
+
+                    message->exec();
+                    partie->newPartie("easy");
                 }
-                if(checkWin) partie->newPartie("easy");
-;
+
                 this->resetPlateau();
             }
         }
@@ -48,6 +46,7 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
 {
     for(unsigned int i = loop_begin; i<cartes.size();i++){
         //  debut loop
+        if(checkWin(cases)) break;
         if(cartes.at(i)->getId() == 9){
             loop_begin = i;
 //            std::cout << "i : " << i << "  arg : " << cartes.at(i)->getArgumentId() << std::endl;
@@ -79,6 +78,7 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
 
             }else if(cartes.at(i)->getArgumentId()==6){
+                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
@@ -121,14 +121,14 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
                 movePersonnage("avancer");
                 movePersonnage("avancer");
             }
-            else if(cartes.at(i)->getArgumentId()==5){
+            else if(cartes.at(i)->getArgumentId()==6){
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
-            }
+            } 
             else movePersonnage("avancer");
         }
         //  tourner a droite
@@ -190,6 +190,7 @@ void Controller::movePersonnage(std::string const movement)
 
 }
 
+//  reset les cases a leur statut de debut de partie
 void Controller::resetPlateau()
 {
     personnage->reset();
@@ -291,6 +292,17 @@ bool Controller::checkAvancer()
     }
 }
 
+bool Controller::checkWin(std::vector<std::vector<Case *>> cases)
+{
+    // check si les cristaux sont recuperes
+    bool checkWin=true;
+    for(unsigned int i=0; i<cases.size();i++){
+        for(unsigned int j=0; j<cases.at(i).size();j++){
+            if(cases.at(i).at(j)->isCristal()) checkWin=false;
+        }
+    }
+    return checkWin;
+}
 
 ////  utile pour tester sans les trackers
 //void Controller::controlKeys(std::vector<Carte*> cartes)
