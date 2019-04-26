@@ -1,5 +1,5 @@
 # codeweaver
-Programme ludique jouable sans souris et clavier.
+Programme ludique jouable sans souris ni clavier.
 Testé sur Ubuntu 18.04 LTS.
 
 INSTALLATION:
