@@ -85,6 +85,9 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
                 i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
 
+            } else {
+                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
             }
 
         }
