@@ -1,19 +1,12 @@
 #include "personnage.h"
 
 
-Personnage::Personnage()
+Personnage::Personnage(QPixmap &pixmap): QGraphicsPixmapItem(pixmap)
 {
+//    this->setTransformOriginPoint(this->boundingRect().center());
 
+//    this->setOffset(this->transformOriginPoint());
 }
-//Personnage::Personnage(unsigned int x, unsigned int y,int direction)
-//{
-//    this->x = x;
-//    this->y = y;
-//    this->direction = direction;
-//    this->start_x = x;
-//    this->start_y = y;
-//    this->start_direction = direction;
-//}
 
 Personnage::~Personnage()
 {
@@ -23,68 +16,58 @@ void Personnage::avancer()
 {
 
         //avance en haut
-        if(this->direction == 0)
-            this->y--;
+        if(this->rotation() == 0)
+            this->moveBy(0,-1);
 
         //avance a droite
-        else if(this->direction == 1)
-            this->x++;
+        else if(this->direction == 90)
+            this->moveBy(1,0);
+
 
         //avance en bas
-        else if(this->direction == 2)
-            this->y++;
+        else if(this->direction == 180)
+            this->moveBy(0,1);
 
         //avance a gauche
-        else if (this->direction == 3)
-            this->x--;
+        else if (this->direction == 270)
+            this->moveBy(-1,0);
+
 
 
 }
 
-void Personnage::set(unsigned int x, unsigned int y, int direction)
-{
-        this->x = x;
-        this->y = y;
-        this->direction = direction;
-        this->start_x = x;
-        this->start_y = y;
-        this->start_direction = direction;
-}
+
 void Personnage::tourner_droite()
 {
-    if(this->direction == 3)
-        direction = 0;
-    else direction++;
+    if(this->rotation() == 360){
+        this->setRotation(0);
+    }
+
+    this->setRotation(this->rotation()+1);
 }
 
 
 void Personnage::tourner_gauche()
 {
-    if(this->direction == 0)
-        direction = 3;
-    else direction --;
+    if(this->rotation() == 0)
+        this->setRotation(360);
+    this->setRotation(this->rotation()-1);
+}
+
+void Personnage::set(unsigned int x, unsigned int y, int direction)
+{
+        this->setPos(x,y);
+        this->setRotation(direction);
+        this->start_x = x;
+        this->start_y = y;
+        this->start_direction = direction;
 }
 
 
 void Personnage::reset()
 {
-    x = start_x;
-    y = start_y;
-    direction = start_direction;
-}
-
-unsigned int Personnage::getX(){
-    return this->x;
-}
-
-unsigned int Personnage::getY()
-{
-    return this->y;
-}
-
-unsigned int Personnage::getDirection()
-{
-    return this->direction;
+    this->setPos(start_x,start_y);
+    this->setRotation(start_direction*90);
 }
 
 

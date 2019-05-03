@@ -10,17 +10,6 @@ Case::Case()
     this->start_cristal = false;
     this->start_personnage_direction = 0;
 }
-//Case::Case(bool personnage, unsigned int personnage_direction, bool cristal, bool plateforme): QLabel()
-//{
-//    this->personnage = personnage;
-//    this->cristal = cristal;
-//    this->personnage_direction = personnage_direction;
-//    this->plateforme = plateforme;
-//    this->start_personnage = personnage;
-//    this->start_cristal = cristal;
-//    this->start_personnage_direction = personnage_direction;
-//    this->display();
-//}
 
 Case::~Case()
 {

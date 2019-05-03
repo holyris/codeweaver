@@ -1,46 +1,40 @@
 #include "partie.h"
 
-Partie::Partie(Personnage* personnage, std::vector<std::vector<Case*>> cases)
+Partie::Partie(Personnage* personnage, std::vector<std::vector<Case*>> cases, QGraphicsView *plateau)
 {
     this->personnage = personnage;
     this->cases = cases;
+    this->plateau = plateau;
+    level = 2;
 }
 
 Partie::~Partie()
 {
-
+    delete personnage;
+    for(unsigned int i =0; i<cases.size();i++){
+        for(unsigned int j = 0; j<cases.at(i).size(); j++)
+            delete cases.at(i).at(j);
+    }
 }
 
 
-void Partie::newPartie(std::string difficulty)
+void Partie::newPartie()
 {
-//    if(difficulty == "easy")
-//        std::ifstream file("maps/easy.txt");
-//    else if(difficulty == "medium")
-//        std::ifstream file("maps/medium.txt");
-//    else if(difficulty == "hard"){
-//        std::ifstream file("maps/hard.txt");
-//    }
-    std::ifstream file("maps/easy.txt");
+
+    std::ifstream file("maps/maps.txt");
 
     if(!file) perror ("Error opening file");
     else
     {
-        int number_of_lines=0;
         std::string line;
         std::stringstream ss;
-        int i = -1;
+        int i = 0;
+        int number_of_lines=0;
 
         //  on compte le nombre de ligne dans le fichier
         while(std::getline(file, line))
             number_of_lines++;
-
-        int rand_line = rand()% (number_of_lines-1);    //  on prend un numero aleatoire entre 0 et number_of_lines
-        //boucle pour eviter de reprendre la meme map qu'avant
-        while(rand_line == last_rand_line)
-            rand_line = rand()% (number_of_lines-1);
-
-        this->last_rand_line = rand_line;
+        this->number_of_level = number_of_lines;
         file.clear();
         file.seekg(std::ios::beg); //   on revient au debut du fichier
 
@@ -48,7 +42,7 @@ void Partie::newPartie(std::string difficulty)
         do{
             std::getline(file, line);
             i++;
-        } while(i!=rand_line);
+        } while(i!=this->level);
 
         ss << line;
         //  on complete plateformes
@@ -71,20 +65,19 @@ void Partie::newPartie(std::string difficulty)
                 ss >> personnage_start_direction;
         }
         file.close();
-        personnage->set(personnage_start_x, personnage_start_y, personnage_start_direction);
+        personnage->set((plateau->size().width()/8) * personnage_start_x,
+                        (plateau->size().height()/8) * personnage_start_y,
+                        personnage_start_direction*90);
         setCases();
     }
 }
 
-void Partie::setPersonnage()
-{
-}
 
 
 void Partie::setCases()
 {
-    for(unsigned int i = 0; i < 8; i++){
-        for(unsigned int j = 0; j < 8; j++){
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
 
             //  si les coord de debut du personnage corresponde a i et j, alors cette case commence avec le personnage
             if(i == personnage_start_y && j == personnage_start_x){
@@ -103,4 +96,18 @@ void Partie::setCases()
         }
     }
 
+}
+
+void Partie::nextLevel()
+{
+    if(level == number_of_level)
+        level = 1;
+    else level++;
+}
+
+void Partie::previousLevel()
+{
+    if(level==1)
+        level = number_of_level;
+    else level--;
 }

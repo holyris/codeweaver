@@ -4,7 +4,13 @@
 #include <QObject>
 #include <QWidget>
 #include <QLayout>
-#include <QPushButton>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsGridLayout>
+#include <QTimer>
+#include <QDebug>
+#include <QStackedLayout>
 #include "case.h"
 #include "personnage.h"
 #include "controller.h"
@@ -15,15 +21,17 @@ class GameWindow : public QWidget
 {
 
 private:
+    QGraphicsScene *scene;
     Controller *controller;
-
+    Personnage *personnage;
+    QGraphicsView *plateau;
     void keyPressEvent(QKeyEvent *event);
+
 
 public:
     GameWindow();
     ~GameWindow();
-
-
+    QGraphicsView *view;
 
 };
 

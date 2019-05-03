@@ -2,7 +2,10 @@
 #define PERSONNAGE_H
 #include <QObject>
 #include <QWidget>
-class Personnage
+#include <QGraphicsPixmapItem>
+#include <iostream>
+
+class Personnage: public QGraphicsPixmapItem
 {
 
 private:
@@ -12,19 +15,16 @@ private:
 
 
 public:
-    Personnage();
+    Personnage(QPixmap &pixmap);
     ~Personnage();
-    unsigned int getX();
-    unsigned int getY();
-    unsigned int getDirection();
     void set(unsigned int x, unsigned int y, int direction);
-
-public slots:
     void tourner_droite();
     void tourner_gauche();
     void avancer();
-    void interagir();
     void reset();
+
+
+
 };
 
 #endif // PERSONNAGE_H

@@ -14,11 +14,10 @@ class Message : public QMessageBox
 private:
     int timeout, currentTime;
 public:
-    Message();
+    Message(int timeout);
     ~Message();
     void showEvent ( QShowEvent *event );
     void timerEvent ( QTimerEvent *event );
-
 
 };
 

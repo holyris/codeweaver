@@ -12,7 +12,9 @@ Detection::Detection()
 
 Detection::~Detection()
 {
-    cartes.clear();
+    for(unsigned int i =0; i<cartes.size();i++){
+        delete cartes.at(i);
+    }
 }
 
 std::vector<Carte*> Detection::launch(){
@@ -73,16 +75,6 @@ std::vector<Carte*> Detection::launch(){
 //            break;
     }
 }
-
-
-
-std::vector<Carte*> Detection::getCartes()
-{
-    return this->final_cartes;
-}
-
-
-
 std::vector<int> Detection::sortTrackers(const std::vector<std::vector<cv::Point2f> > &affinedCorners, std::vector<int> const &affinedIds)
 {
     std::vector<int> vect_y;
@@ -254,7 +246,7 @@ void Detection::detectOptions()
                 if(cartes.at(j)->getType() == "argument"){
 
                     // verif si yen a une a droite
-                    if(cartes.at(i)->getX() < cartes.at(j)->getX() && cartes.at(j)->getX() <= cartes.at(i)->getX()+100){
+                    if(cartes.at(i)->getX()-100 <= cartes.at(j)->getX() && cartes.at(j)->getX() <= cartes.at(i)->getX()+100){
                         // verif si c'est a peu pres a la meme hauteur
                         if(cartes.at(j)->getY() <= cartes.at(i)->getY()+30 && cartes.at(j)->getY() >= cartes.at(i)->getY()-30){
 

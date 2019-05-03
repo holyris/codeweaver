@@ -1,22 +1,27 @@
 #include "message.h"
 
-Message::Message(): QMessageBox()
+Message::Message(int timeout): QMessageBox()
 {
-    timeout = 10;
+    this->timeout = timeout;
     currentTime = 0;
-    this->setWindowFlags(Qt::FramelessWindowHint);
+//    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::CustomizeWindowHint);
+
 
     this->setStandardButtons(0);
-    this->setText("BRAVO");
     QString string = "Fin dans "+QString::number(timeout);
     this->setInformativeText(string);
+
+    int nWidth = 300;
+    int nHeight = 400;
+
+    this->resize(nWidth, nHeight);
 }
 
 Message::~Message()
 {
 
 }
-
 
 void Message::showEvent( QShowEvent *event ) {
     currentTime = 0;

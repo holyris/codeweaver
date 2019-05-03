@@ -36,6 +36,11 @@ Carte::Carte(int id, std::string type)
 
 }
 
+Carte::~Carte()
+{
+
+}
+
 void Carte::setArgumentId(int argument_id)
 {
     this->argument_id = argument_id;

@@ -20,7 +20,6 @@ class Detection
     private:
         int frame;
         std::vector<Carte*> cartes;
-        std::vector<Carte*> final_cartes;
         std::vector<int> sortedIds;
         cv::VideoCapture inputVideo;
         cv::Ptr<cv::aruco::Dictionary> dictionary;
@@ -42,7 +41,6 @@ class Detection
         Detection();
         ~Detection();
         std::vector<Carte*> launch();
-        std::vector<Carte*> getCartes();
 
 
     public slots:
