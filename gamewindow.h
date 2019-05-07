@@ -1,6 +1,6 @@
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
-
+#include <QApplication>
 #include <QObject>
 #include <QWidget>
 #include <QLayout>
@@ -8,6 +8,8 @@
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsGridLayout>
+#include <QGraphicsWidget>
+#include <QGraphicsProxyWidget>
 #include <QTimer>
 #include <QDebug>
 #include <QStackedLayout>
@@ -19,19 +21,26 @@
 #include "partie.h"
 class GameWindow : public QWidget
 {
+    Q_OBJECT
 
 private:
     QGraphicsScene *scene;
     Controller *controller;
     Personnage *personnage;
     QGraphicsView *plateau;
-    void keyPressEvent(QKeyEvent *event);
+    QWidget *widget_grille_plateau;
+//    void keyPressEvent(QKeyEvent *event);
+
 
 
 public:
     GameWindow();
     ~GameWindow();
     QGraphicsView *view;
+
+
+private slots:
+    void start();
 
 };
 
