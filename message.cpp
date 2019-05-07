@@ -9,7 +9,7 @@ Message::Message(int timeout): QMessageBox()
 
 
     this->setStandardButtons(0);
-    QString string = "Fin dans "+QString::number(timeout);
+    QString string = "temps restant :  "+QString::number(timeout);
     this->setInformativeText(string);
 
     int nWidth = 300;
@@ -33,7 +33,7 @@ void Message::timerEvent(QTimerEvent *event)
 {
 
     currentTime++;
-    QString string = "Fin dans " + QString::number(timeout-currentTime);
+    QString string = "temps restant :  " + QString::number(timeout-currentTime);
     this->setInformativeText(string);
     if (currentTime>timeout) {
         this->done(0);
