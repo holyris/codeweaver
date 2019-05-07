@@ -81,39 +81,39 @@ void Carte::setArgumentName(int id){
         argument_name = QString("x6");
 
 }
-int Carte::getArgumentId()
+int Carte::getArgumentId() const
 {
     return this->argument_id;
 }
 
 
 
-int Carte::getId()
+int Carte::getId() const
 {
     return id;
 }
 
-std::string Carte::getType()
+std::string Carte::getType() const
 {
     return type;
 }
 
-int Carte::getX()
+int Carte::getX() const
 {
     return x;
 }
 
-int Carte::getY()
+int Carte::getY() const
 {
     return y;
 }
 
-QString Carte::getName()
+QString Carte::getName() const
 {
     return this->name;
 }
 
-QString Carte::getArgumentName()
+QString Carte::getArgumentName() const
 {
     return this->argument_name;
 }

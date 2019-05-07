@@ -27,14 +27,14 @@ public:
     Carte(int id, std::string type);
     ~Carte();
     void setArgumentId(int const argument_id);
-    int getId();
-    int getX();
-    int getY();
+    int getId() const;
+    int getX() const;
+    int getY() const;
 
-    QString getName();
-    QString getArgumentName();
-    std::string getType();
-    int getArgumentId();
+    QString getName() const;
+    QString getArgumentName() const;
+    std::string getType() const;
+    int getArgumentId() const;
 };
 
 #endif // CARTE_H
