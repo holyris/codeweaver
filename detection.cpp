@@ -49,31 +49,13 @@ std::vector<Carte*> Detection::launch(){
 
         detectOptions();
         frame++;
-        if(frame == 30 /*&& affinedIds.size() > 0*/){
+        if(frame == 30){
             frame = 0;
             return cartes;
         }
-//        //  checkStartGoal permet d'avoir la condition de lancement de maniere fiable
-//        if(checkStartGoal()){
-//            manyGoalChecked.clear();
-//            manyGoalChecked2.clear();
-//            manyCorners.clear();
-//            manyIds.clear();
-//            final_cartes = cartes;
-//            cartes.clear();
-//            break;
-//        }
-
-        // if at least one marker detected
-//        if (ids.size() > 0)
-//        {
-//            cv::aruco::drawDetectedMarkers(imageCopy, corners, ids);
-//        }
-//        cv::imshow("out", imageCopy);
-//        char key = (char)cv::waitKey(10);
-//        if (key == 27)
-//            break;
     }
+    //  idiot de compilateur
+    return cartes;
 }
 std::vector<int> Detection::sortTrackers(const std::vector<std::vector<cv::Point2f> > &affinedCorners, std::vector<int> const &affinedIds)
 {
@@ -130,7 +112,6 @@ std::vector<std::vector<cv::Point2f> > Detection::sortCorners(const std::vector<
     return sortedCorners;
 }
 
-
 cv::Point2f Detection::getCenter(std::vector<cv::Point2f> const &input)
 {
 
@@ -140,50 +121,7 @@ cv::Point2f Detection::getCenter(std::vector<cv::Point2f> const &input)
 
     return center;
 }
-//  affine la condition de lancement
-bool Detection::affinageStartGoal(){
 
-    bool check = false;
-
-    if(!sortedIds.empty()){
-        check = true;
-        //  si l'element tout en bas est goal et que celui tout en haut est start alors push true
-        if(sortedIds.back() == 15)
-            manyGoalChecked.push_back(true);
-        else
-            manyGoalChecked.push_back(false);
-
-        //pour limiter la taille du vector
-        if(manyGoalChecked.size() >= 3)
-            manyGoalChecked.erase(manyGoalChecked.begin());
-
-        //  regarde dans le vector pour voir si il y a un false
-        for(unsigned int i = 0; i < manyGoalChecked.size(); i++){
-            //  s'il y a un false alors on est pas assez sur que la condition de lancement de jeu soit remplie
-            if(manyGoalChecked.at(i) == false)
-                check = false;
-
-        }
-
-    }
-    return check;
-}
-//  cette fonction permet encore plus d'affiner la condition de lancement
-bool Detection::checkStartGoal(){
-    int j=0;
-
-    manyGoalChecked2.push_back(affinageStartGoal());
-    if(manyGoalChecked2.size() >= 30){
-        manyGoalChecked2.erase(manyGoalChecked2.begin());
-    }
-    for(unsigned int i = 0; i < manyGoalChecked2.size(); i++){
-        if(manyGoalChecked2.at(i) == true){
-            j++;
-        }
-    }
-    if(j>=15) return true;
-    else return false;
-}
 
 /*
  * quand on cherche l'ordre des cartes sur l'image, il arrive que certaines ne soient pas captées

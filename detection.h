@@ -32,8 +32,6 @@ class Detection
         std::vector<std::vector<cv::Point2f>> affinageCorners(std::vector<std::vector<cv::Point2f>> const &input);
         std::vector<std::vector<cv::Point2f>> sortCorners(std::vector<std::vector<cv::Point2f>> const &input);
         cv::Point2f getCenter(std::vector<cv::Point2f> const &input);
-        bool affinageStartGoal();
-        bool checkStartGoal();
         void detectOptions();
         cv::Mat rotateImage(cv::Mat image, double angle);
 
@@ -41,11 +39,6 @@ class Detection
         Detection();
         ~Detection();
         std::vector<Carte*> launch();
-
-
-    public slots:
-
-
 
 
 };
