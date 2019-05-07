@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QGraphicsView>
-#include <QThread>
 #include <iostream>
 #include <unistd.h>
 #include <vector>
@@ -28,22 +27,22 @@ class Controller: QWidget
     Q_OBJECT
 
 private:
-    bool mutex;
-    int currentPix;
+    int movement;
     Personnage *personnage;
+    std::vector<Carte*> cartes;
     std::vector<std::vector<Case*>> cases;
     std::vector<QLabel*> labels;
     Partie *partie;
     Detection *detection;
-    QTimer *timer_avancer, *timer_droite, *timer_gauche, *timer;
+    QTimer *timer;
     QGraphicsView *plateau;
-    void resetPlateau();
+
     void displayFunctions(std::vector<Carte*> cartes);
-    unsigned int controlPersonnage(std::vector<Carte*> cartes, unsigned int loop_begin, unsigned int marqueur);
+    unsigned int controlPersonnage(unsigned int loop_begin);
     void movePersonnage(std::string movement);
     void controlKeys(std::vector<Carte*> cartes);
-    bool checkAvancer();
-    bool checkWin(std::vector<std::vector<Case*>> cases);
+    bool checkAvancer() const;
+    bool checkWin(std::vector<std::vector<Case*>> cases) const;
     inline void CenterWidgets(QWidget *widget, QWidget *host = 0);
 
 public:
@@ -55,10 +54,7 @@ public:
 
 private slots:
     void controlCartes();
-    void avancerAnimation();
-    void droiteAnimation();
-    void gaucheAnimation();
-
+    void animation();
 
 };
 

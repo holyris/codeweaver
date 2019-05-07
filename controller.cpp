@@ -8,17 +8,9 @@ Controller::Controller(Personnage *personnage, std::vector<std::vector<Case*>> c
     this->partie = new Partie(personnage, cases, plateau);
     this->plateau = plateau;
     timer = new QTimer();
-    timer_avancer = new QTimer();
-    timer_droite = new QTimer();
-    timer_gauche = new QTimer();
 
-    QObject::connect( timer,SIGNAL(timeout()), this, SLOT(controlCartes()));
-    QObject::connect( timer_avancer,SIGNAL(timeout()),this,SLOT(avancerAnimation()) );
-    QObject::connect( timer_droite,SIGNAL(timeout()),this,SLOT(droiteAnimation()) );
-    QObject::connect( timer_gauche,SIGNAL(timeout()),this,SLOT(gaucheAnimation()) );
-
-    mutex == false;
-    currentPix = 0;
+    QObject::connect( timer,SIGNAL(timeout()), this, SLOT(controlCartes()) );
+    movement = 0;
 }
 
 Controller::~Controller()
@@ -28,9 +20,6 @@ Controller::~Controller()
     delete detection;
     delete plateau;
     delete timer;
-    delete timer_gauche;
-    delete timer_droite;
-    delete timer_avancer;
     for(unsigned int i =0; i<labels.size();i++){
         delete labels.at(i);
     }
@@ -39,70 +28,90 @@ Controller::~Controller()
         for(unsigned int j=0 ; j<cases.at(i).size(); j++)
             delete cases.at(i).at(j);
     }
+
+    for(unsigned int i =0; i<cartes.size();i++){
+        delete cartes.at(i);
+    }
 }
 
 void Controller::start()
 {
-    personnage->setTransformOriginPoint(personnage->boundingRect().center());
-//    personnage->setOffset(personnage->transformOriginPoint());
     partie->newPartie();
 
-    timer->start(300);
+
+    timer->setSingleShot(true);
+
+    timer->start(1000);
+
+    qApp->processEvents();
+
 
 
 }
 
 //  fonction pour controler le personnage en fonction des cartes captees
 void Controller::controlCartes()
-{    
-//    while(mutex==true);
-    std::vector<Carte*> cartes = detection->launch();
-
-    //  pour changer de niveau
-    for(unsigned int i = 0; i<cartes.size(); i++){
-        if(cartes.at(i)->getId() == 1){
-            Message *message = new Message(3);
-            message->setText("Niveau suivant..");
-            CenterWidgets(message);
-            message->exec();
-            partie->nextLevel();
-            partie->newPartie();
-        }
-        else if (cartes.at(i)->getId() == 3){
-            Message *message = new Message(3);
-            message->setText("Niveau précédent..");
-            CenterWidgets(message);
-            message->exec();
-            partie->previousLevel();
-            partie->newPartie();
-        }
-    }
-
-
+{
+    cartes = detection->launch();
     displayFunctions(cartes);
-    if(!cartes.empty()){
-        if(cartes.back()->getId()==15){
 
-            controlPersonnage(cartes, 0,1);
+    if(!cartes.empty()) {
 
-            if(checkWin(cases)){
-                Message *message = new Message(5);
-                message->setText("Victoire !");
+        //  pour changer de niveau
+        for(unsigned int i = 0; i<cartes.size(); i++){
+            if(cartes.at(i)->getId() == 1){
+                Message *message = new Message(3);
+                message->setText("Niveau suivant");
                 CenterWidgets(message);
                 message->exec();
                 partie->nextLevel();
                 partie->newPartie();
             }
-//            usleep(500000);
+            else if (cartes.at(i)->getId() == 3){
+                Message *message = new Message(3);
+                message->setText("Niveau précédent");
+                CenterWidgets(message);
+                message->exec();
+                partie->previousLevel();
                 partie->newPartie();
-                qApp->processEvents();
-
-
+            }
         }
+
+
+        if(cartes.back()->getId()!=15){
+
+            timer->start();
+            qApp->processEvents();
+            return;
+        }
+    } else {
+
+        timer->start();
+        qApp->processEvents();
+        return;
     }
 
-}
 
+    controlPersonnage(0);
+
+    if(checkWin(cases)){
+        Message *message = new Message(5);
+        message->setText("Victoire !");
+        CenterWidgets(message);
+        message->exec();
+        partie->nextLevel();
+        partie->newPartie();
+    }
+    usleep(500000);
+    plateau->update();
+    partie->newPartie();
+    timer->start();
+    return;
+
+
+
+}
+//  un truc pour soi disant centrer un widget
 inline void Controller::CenterWidgets(QWidget *widget, QWidget *host) {
     if (!host)
         host = widget->parentWidget();
@@ -119,58 +128,58 @@ inline void Controller::CenterWidgets(QWidget *widget, QWidget *host) {
     }
 }
 
-unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned int loop_begin, unsigned int marqueur)
+unsigned int Controller::controlPersonnage(unsigned int loop_begin)
 {
 
     for(unsigned int i = loop_begin; i<cartes.size();i++){
-        //  debut loop
         if(checkWin(cases)) break;
+
+        //  debut loop
         if(cartes.at(i)->getId() == 9){
             loop_begin = i;
 
 
             if(cartes.at(i)->getArgumentId()==11){
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
 
             }
             else if(cartes.at(i)->getArgumentId()==14){
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
 
             }
             else if(cartes.at(i)->getArgumentId()==4){
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
 
 
             }else if(cartes.at(i)->getArgumentId()==5){
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
 
             }else if(cartes.at(i)->getArgumentId()==6){
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
 
             } else {
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
-                i = controlPersonnage(cartes, loop_begin+1,marqueur+1);
+                i = controlPersonnage(loop_begin+1);
+                i = controlPersonnage(loop_begin+1);
             }
 
         }
         //  fin loop
         else if(cartes.at(i)->getId() == 8){
-//            if(marqueur >= 2) break;
             return i;
         }
         //  avancer
@@ -192,7 +201,6 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
-
             }
             else if(cartes.at(i)->getArgumentId()==5){
                 movePersonnage("avancer");
@@ -208,10 +216,11 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
                 movePersonnage("avancer");
                 movePersonnage("avancer");
                 movePersonnage("avancer");
-            } 
+            }
             else movePersonnage("avancer");
         }
         //  tourner a droite
+
         else if(cartes.at(i)->getId() == 7)
         {
 
@@ -240,87 +249,82 @@ unsigned int Controller::controlPersonnage(std::vector<Carte*> cartes, unsigned 
 
 void Controller::movePersonnage(std::string const movement)
 {
-//    usleep(500000);
-
+    usleep(200000);
 
     if(movement == "avancer"){
         if(checkAvancer()){
+            this->movement = 0;
 
-            if(!timer_avancer->isActive()){
-                timer_avancer->start(3);
-                mutex = true;
-
-            }
-            qApp->processEvents();
         }
+        else{
+            this->movement = 3;
+        }
+        animation();
+        cases.at(personnage->pos().y()/(plateau->size().height()/8)).at(personnage->pos().x()/(plateau->size().width()/8))->deleteCristal();
+
+
     }
     else if(movement=="droite"){
-
-        if(!timer_droite->isActive()){
-            timer_droite->start(3);
-            mutex = true;
-
-        }
-        qApp->processEvents();
+        this->movement = 1;
+        animation();
     }
 
     else if(movement=="gauche"){
+        this->movement = 2;
+        animation();
+    }
 
+}
 
-        if(!timer_gauche->isActive()){
-            timer_gauche->start(3);
-            mutex = true;
+void Controller::animation()
+{
+    //avancer
+    if(movement == 0){
+        for(int i = 0; i<plateau->size().height()/8;i++){
+            usleep(2000);
+//            cases.at(personnage->pos().y()/(plateau->size().height()/8)).at(personnage->pos().x()/(plateau->size().width()/8))->deleteCristal();
 
+            //faire disparaite le cristal au bon moment
+//            if(i>plateau->size().height()/10){
+//            }
+            personnage->avancer();
+            qApp->processEvents();
         }
-        qApp->processEvents();
-    }
-}
 
-void Controller::avancerAnimation()
-{
+     //tourner a droite
+    } else if(movement == 1){
+        for(int i = 0; i<90;i++){
+            usleep(2000);
+            personnage->tourner_droite();
+            qApp->processEvents();
+        }
 
-    personnage->avancer();
-    currentPix++;
-    if(currentPix > plateau->size().width()/8){
-        timer_avancer->stop();
-        currentPix = 0;
-        mutex = false;
-    }
+     //tourner a gauche
+    } else if(movement == 2){
 
-}
-
-void Controller::droiteAnimation()
-{
-    personnage->tourner_droite();
-    currentPix++;
-    if(currentPix > 89){
-        timer_droite->stop();
-        currentPix = 0;
-        mutex = false;
-    }
-}
-
-void Controller::gaucheAnimation()
-{
-    personnage->tourner_gauche();
-    currentPix++;
-    if(currentPix > 89){
-        timer_gauche->stop();
-        currentPix = 0;
-        mutex = false;
-    }
-}
-
-//  reset les cases a leur statut de debut de partie
-void Controller::resetPlateau()
-{
-    personnage->reset();
-    for(unsigned int i = cases.size(); i--;){
-        for(unsigned int j = cases.at(i).size();j--;){
-            cases.at(i).at(j)->reset();
+        for(int i = 0; i<90;i++){
+            usleep(2000);
+            personnage->tourner_gauche();
+            qApp->processEvents();
         }
     }
+    //se cogner
+    else if(movement == 3){
+
+        for(int i = 0; i<plateau->size().height()/25;i++){
+            usleep(5000);
+            personnage->avancer();
+            qApp->processEvents();
+        }
+        for(int i = 0; i<plateau->size().height()/25;i++){
+            usleep(5000);
+            personnage->reculer();
+            qApp->processEvents();
+        }
+    }
+
 }
+
 
 //  pour afficher les fonctions dans l'ordre des cartes
 void Controller::displayFunctions(std::vector<Carte*> cartes)
@@ -355,11 +359,13 @@ void Controller::setLabels(std::vector<QLabel*> labels)
 }
 
 //  fonction pour verif si le perso peut avancer
-bool Controller::checkAvancer()
+bool Controller::checkAvancer() const
 {
+
     //  si le personnage va en haut
     if(personnage->rotation()==0)
     {
+
         //verif pour pas depasser limite
         if(personnage->pos().y()==0)
             return false;
@@ -370,6 +376,8 @@ bool Controller::checkAvancer()
 
         else
             return true;
+
+
     }
     //  si le perso va a droite
     else if(personnage->rotation()==90)
@@ -417,7 +425,7 @@ bool Controller::checkAvancer()
     return false;
 }
 
-bool Controller::checkWin(std::vector<std::vector<Case *>> cases)
+bool Controller::checkWin(std::vector<std::vector<Case *>> cases) const
 {
     // check si les cristaux sont recuperes
     bool checkWin=true;
@@ -428,43 +436,6 @@ bool Controller::checkWin(std::vector<std::vector<Case *>> cases)
     }
     return checkWin;
 }
-
-////  utile pour tester sans les trackers
-//void Controller::controlKeys(std::vector<Carte*> cartes)
-//{
-//    while(1){
-//        displayFunctions(cartes);
-//        controlPersonnage(cartes, 0,1);
-//        usleep(500000);
-//        this->resetPlateau();
-
-//    }
-//}
-
-////  utile pour tester sans les trackers
-//void Controller::keyPressEvent(QKeyEvent *event)
-//{
-//    if(event->key()==Qt::Key_S)
-//        cartes.push_back(new Carte(16,"function"));
-//    else if(event->key()==Qt::Key_G)
-//        cartes.push_back(new Carte(15,"function"));
-//    else if(event->key()==Qt::Key_Up)
-//        cartes.push_back(new Carte(13,"function"));
-//    else if(event->key()==Qt::Key_Left)
-//        cartes.push_back(new Carte(10,"function"));
-//    else if(event->key()==Qt::Key_Right)
-//        cartes.push_back(new Carte(7,"function"));
-//    else if(event->key()==Qt::Key_I)
-//        cartes.push_back(new Carte(0,"function"));
-//    else if(event->key()==Qt::Key_L)
-//        cartes.push_back(new Carte(9,"function"));
-//    else if(event->key()==Qt::Key_M)
-//        cartes.push_back(new Carte(8,"function"));
-//    else if(event->key()==Qt::Key_Backspace)
-//        controlKeys(cartes);
-
-
-//}
 
 
 
