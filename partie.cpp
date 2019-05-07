@@ -5,7 +5,7 @@ Partie::Partie(Personnage* personnage, std::vector<std::vector<Case*>> cases, QG
     this->personnage = personnage;
     this->cases = cases;
     this->plateau = plateau;
-    level = 2;
+    level = 3;
 }
 
 Partie::~Partie()
@@ -38,7 +38,7 @@ void Partie::newPartie()
         file.clear();
         file.seekg(std::ios::beg); //   on revient au debut du fichier
 
-        //  on recup la ligne du numero aleatoire
+        //  on recup la ligne du numero
         do{
             std::getline(file, line);
             i++;
