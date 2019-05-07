@@ -9,11 +9,15 @@ Case::Case()
     this->start_personnage = 0;
     this->start_cristal = false;
     this->start_personnage_direction = 0;
+    this->currentFrame = 0;
+    timer = new QTimer();
+    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(animation()));
+
 }
 
 Case::~Case()
 {
-
+    delete timer;
 }
 void Case::set(bool personnage, unsigned int personnage_direction, bool cristal, bool plateforme)
 {
@@ -54,21 +58,21 @@ void Case::reset()
     this->display();
 }
 
+void Case::deleteCristal()
+{
+    if(cristal){
+        cristal = false;
+        timer->start(150);
+        qApp->processEvents();
+    }
+
+
+}
+
 //  affiche en fonction de l'etat de la case
 void Case::display()
 {
-
-    if(isPersonnage()){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        QPixmap pix("images/plateforme+perso.png");
-        QTransform transform;
-        transform.rotate(personnage_direction*90);
-        QPixmap rotatedPixelFrame = pix.transformed(transform);
-        this->setPixmap(rotatedPixelFrame);
-        this->repaint();
-        this->repaint();
-    } else if(isCristal()){
+    if(isCristal()){
         this->setScaledContents( true );
         this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
         this->setPixmap(QPixmap("images/plateforme+cristal.png"));
@@ -87,17 +91,47 @@ void Case::display()
 
 
 
-bool Case::isPersonnage()
+bool Case::isPersonnage() const
 {
     return personnage;
 }
 
-bool Case::isCristal()
+bool Case::isCristal() const
 {
     return cristal;
 }
 
-bool Case::isPlateforme()
+bool Case::isPlateforme() const
 {
     return plateforme;
+}
+
+void Case::animation()
+{
+    currentFrame++;
+    if(currentFrame==1){
+        this->setScaledContents( true );
+        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        this->setPixmap(QPixmap("images/plateforme+explosion1.png"));
+        this->repaint();
+    }
+    else if(currentFrame==2){
+        this->setScaledContents( true );
+        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        this->setPixmap(QPixmap("images/plateforme+explosion2.png"));
+        this->repaint();
+    }
+    else if(currentFrame==3){
+        this->setScaledContents( true );
+        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        this->setPixmap(QPixmap("images/plateforme+explosion3.png"));
+        this->repaint();
+    }
+    else {
+        timer->stop();
+        this->display();
+    }
+
+
+
 }
