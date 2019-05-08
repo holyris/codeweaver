@@ -98,7 +98,7 @@ void Personnage::set(unsigned int x, unsigned int y, int direction)
 void Personnage::reset()
 {
     this->setPos(start_x,start_y);
-    this->setRotation(start_direction*90);
+    this->setRotation(start_direction);
 }
 
 
