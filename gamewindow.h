@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QLayout>
+#include <QLabel>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
@@ -28,8 +29,9 @@ private:
     Controller *controller;
     Personnage *personnage;
     QGraphicsView *plateau;
+    QStackedLayout *stacked_layout;
     QWidget *widget_grille_plateau;
-//    void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 
 
