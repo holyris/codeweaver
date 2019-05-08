@@ -39,11 +39,11 @@ void Controller::start()
     partie->newPartie();
 
 
-    timer->setSingleShot(true);
+//    timer->setSingleShot(true);
 
-    timer->start(1000);
+//    timer->start(1000);
 
-    qApp->processEvents();
+//    qApp->processEvents();
 
 
 
@@ -104,7 +104,7 @@ void Controller::controlCartes()
     }
     usleep(500000);
     plateau->update();
-    partie->newPartie();
+    resetPlateau();
     timer->start();
     return;
 
@@ -358,6 +358,37 @@ void Controller::setLabels(std::vector<QLabel*> labels)
     this->labels = labels;
 }
 
+void Controller::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()==Qt::Key_Z)
+        movePersonnage("avancer");
+    else if(event->key()==Qt::Key_Q)
+        movePersonnage("gauche");
+    else if(event->key()==Qt::Key_D)
+        movePersonnage("droite");
+    else if(event->key()==Qt::Key_R)
+        resetPlateau();
+    else if(event->key()==Qt::Key_L){
+        Message *message = new Message(3);
+        message->setText("Niveau suivant");
+        CenterWidgets(message);
+        message->exec();
+        partie->previousLevel();
+        partie->newPartie();
+    }
+    else if(event->key()==Qt::Key_M){
+        Message *message = new Message(3);
+        message->setText("Niveau suivant");
+        CenterWidgets(message);
+        message->exec();
+        partie->nextLevel();
+        partie->newPartie();
+    }
+
+
+
+}
+
 //  fonction pour verif si le perso peut avancer
 bool Controller::checkAvancer() const
 {
@@ -436,6 +467,18 @@ bool Controller::checkWin(std::vector<std::vector<Case *>> cases) const
     }
     return checkWin;
 }
+
+void Controller::resetPlateau()
+{
+    plateau->repaint();
+    personnage->reset();
+    for(unsigned int i=0;i<cases.size();i++){
+        for(unsigned int j=0; j<cases.at(i).size();j++){
+            cases.at(i).at(j)->reset();
+        }
+    }
+}
+
 
 
 

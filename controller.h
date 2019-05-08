@@ -43,6 +43,7 @@ private:
     void controlKeys(std::vector<Carte*> cartes);
     bool checkAvancer() const;
     bool checkWin(std::vector<std::vector<Case*>> cases) const;
+    void resetPlateau();
     inline void CenterWidgets(QWidget *widget, QWidget *host = 0);
 
 public:
@@ -50,7 +51,7 @@ public:
     ~Controller();
     void start();
     void setLabels(std::vector<QLabel*> labels);
-//    void keyPressEvent(QKeyEvent* event);
+    void keyPressEvent(QKeyEvent* event);
 
 private slots:
     void controlCartes();
