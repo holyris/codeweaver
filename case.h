@@ -12,8 +12,10 @@ class Case : public QLabel
     Q_OBJECT
 
 private:
+
     QTimer *timer;
     int currentFrame;
+    int randomRotation, randomMirrorX, randomMirrorY;
     bool cristal;
     bool personnage;
     unsigned int personnage_direction;

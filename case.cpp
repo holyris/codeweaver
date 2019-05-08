@@ -2,6 +2,7 @@
 
 Case::Case()
 {
+    srand (time(NULL));
     this->personnage = false;
     this->cristal = false;
     this->personnage_direction = 0;
@@ -12,6 +13,8 @@ Case::Case()
     this->currentFrame = 0;
     timer = new QTimer();
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(animation()));
+    randomRotation = 0;
+
 
 }
 
@@ -25,9 +28,15 @@ void Case::set(bool personnage, unsigned int personnage_direction, bool cristal,
     this->cristal = cristal;
     this->personnage_direction = personnage_direction;
     this->plateforme = plateforme;
-    this->start_personnage = personnage;
-    this->start_cristal = cristal;
-    this->start_personnage_direction = personnage_direction;
+    start_personnage = personnage;
+    start_cristal = cristal;
+    start_personnage_direction = personnage_direction;
+    randomRotation = rand() % 4;
+    randomMirrorX = rand() % 2;
+    randomMirrorY = rand() % 2;
+
+    if(randomMirrorX==0) randomMirrorX = -1;
+    if(randomMirrorY==0) randomMirrorY = -1;
     this->display();
 }
 void Case::setPersonnage(bool personnage)
@@ -72,21 +81,20 @@ void Case::deleteCristal()
 //  affiche en fonction de l'etat de la case
 void Case::display()
 {
-    if(isCristal()){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/plateforme+cristal.png"));
-        this->repaint();
-    } else if(isPlateforme()){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/plateforme.png"));
-        this->repaint();
+    this->setScaledContents( true );
+    this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    QPixmap pix;
 
-    } else {
-        this->setPixmap(QPixmap());
-        this->repaint();
+    if(isCristal()){
+        pix.load("images/plateforme.png");
+    } else if(isPlateforme()){
+        pix.load("images/plateforme.png");
     }
+
+    pix = pix.transformed(QTransform().rotate(randomRotation*90));
+    pix = pix.transformed(QTransform().scale(randomMirrorX, randomMirrorY));
+    this->setPixmap(pix);
+    this->repaint();
 }
 
 
@@ -108,29 +116,29 @@ bool Case::isPlateforme() const
 
 void Case::animation()
 {
-    currentFrame++;
-    if(currentFrame==1){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/plateforme+explosion1.png"));
-        this->repaint();
-    }
-    else if(currentFrame==2){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/plateforme+explosion2.png"));
-        this->repaint();
-    }
-    else if(currentFrame==3){
-        this->setScaledContents( true );
-        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-        this->setPixmap(QPixmap("images/plateforme+explosion3.png"));
-        this->repaint();
-    }
-    else {
-        timer->stop();
-        this->display();
-    }
+//    currentFrame++;
+//    if(currentFrame==1){
+//        this->setScaledContents( true );
+//        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+//        this->setPixmap(QPixmap("images/plateforme+explosion1.png"));
+//        this->repaint();
+//    }
+//    else if(currentFrame==2){
+//        this->setScaledContents( true );
+//        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+//        this->setPixmap(QPixmap("images/plateforme+explosion2.png"));
+//        this->repaint();
+//    }
+//    else if(currentFrame==3){
+//        this->setScaledContents( true );
+//        this->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+//        this->setPixmap(QPixmap("images/plateforme+explosion3.png"));
+//        this->repaint();
+//    }
+//    else {
+//        timer->stop();
+//        this->display();
+//    }
 
 
 
