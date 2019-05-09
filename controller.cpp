@@ -1,15 +1,12 @@
 #include "controller.h"
 
-Controller::Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases, QGraphicsView *plateau)
+Controller::Controller(Partie *partie)
 {
-    this->personnage = personnage;
-    this->cases = cases;
-    this->detection = new Detection();
-    this->partie = new Partie(personnage, cases, plateau);
-    this->plateau = plateau;
+    this->partie = partie;
+    detection = new Detection();
     timer = new QTimer();
-
     QObject::connect( timer,SIGNAL(timeout()), this, SLOT(controlCartes()) );
+
     movement = 0;
 }
 
@@ -20,30 +17,28 @@ Controller::~Controller()
     delete detection;
     delete plateau;
     delete timer;
-    for(unsigned int i =0; i<labels.size();i++){
-        delete labels.at(i);
-    }
+    labels.clear();
+    cartes.clear();
+    cristaux.clear();
 
-    for(unsigned int i =0; i<cases.size();i++){
-        for(unsigned int j=0 ; j<cases.at(i).size(); j++)
-            delete cases.at(i).at(j);
-    }
-
-    for(unsigned int i =0; i<cartes.size();i++){
-        delete cartes.at(i);
-    }
+    for(unsigned int i=0 ; i<cases.at(i).size(); i++)
+        cases.at(i).clear();
 }
 
 void Controller::start()
 {
-    partie->newPartie();
 
+    newPartie("");
 
-//    timer->setSingleShot(true);
+    personnage = partie->getPersonnage();
+    cases = partie->getCases();
+    plateau = partie->getPlateau();
 
-//    timer->start(1000);
+    timer->setSingleShot(true);
 
-//    qApp->processEvents();
+    timer->start(1000);
+
+    qApp->processEvents();
 
 
 
@@ -52,29 +47,21 @@ void Controller::start()
 //  fonction pour controler le personnage en fonction des cartes captees
 void Controller::controlCartes()
 {
+
+
     cartes = detection->launch();
-    displayFunctions(cartes);
+    displayFunctions();
 
     if(!cartes.empty()) {
 
         //  pour changer de niveau
         for(unsigned int i = 0; i<cartes.size(); i++){
-            if(cartes.at(i)->getId() == 1){
-                Message *message = new Message(3);
-                message->setText("Niveau suivant");
-                CenterWidgets(message);
-                message->exec();
-                partie->nextLevel();
-                partie->newPartie();
-            }
-            else if (cartes.at(i)->getId() == 3){
-                Message *message = new Message(3);
-                message->setText("Niveau précédent");
-                CenterWidgets(message);
-                message->exec();
-                partie->previousLevel();
-                partie->newPartie();
-            }
+            if(cartes.at(i)->getId() == 1)
+                newPartie("next");
+
+            else if (cartes.at(i)->getId() == 3)
+                newPartie("previous");
+
         }
 
 
@@ -90,26 +77,16 @@ void Controller::controlCartes()
         qApp->processEvents();
         return;
     }
-
-
     controlPersonnage(0);
 
-    if(checkWin(cases)){
-        Message *message = new Message(5);
-        message->setText("Victoire !");
-        CenterWidgets(message);
-        message->exec();
-        partie->nextLevel();
-        partie->newPartie();
-    }
+    if(checkWin())
+        newPartie("win");
+
     usleep(500000);
     plateau->update();
     resetPlateau();
     timer->start();
     return;
-
-
-
 }
 //  un truc pour soi disant centrer un widget
 inline void Controller::CenterWidgets(QWidget *widget, QWidget *host) {
@@ -132,7 +109,7 @@ unsigned int Controller::controlPersonnage(unsigned int loop_begin)
 {
 
     for(unsigned int i = loop_begin; i<cartes.size();i++){
-        if(checkWin(cases)) break;
+        if(checkWin()) break;
 
         //  debut loop
         if(cartes.at(i)->getId() == 9){
@@ -186,38 +163,27 @@ unsigned int Controller::controlPersonnage(unsigned int loop_begin)
         else if(cartes.at(i)->getId() == 13){
 
             if(cartes.at(i)->getArgumentId()==11){
-                movePersonnage("avancer");
-                movePersonnage("avancer");
+                movePersonnage("avancer",2);
 
             }
             else if(cartes.at(i)->getArgumentId()==14){
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
+                movePersonnage("avancer",3);
+
 
             }
             else if(cartes.at(i)->getArgumentId()==4){
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
+                movePersonnage("avancer",4);
+
             }
             else if(cartes.at(i)->getArgumentId()==5){
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
+                movePersonnage("avancer",5);
+
             }
             else if(cartes.at(i)->getArgumentId()==6){
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
-                movePersonnage("avancer");
+                movePersonnage("avancer",6);
+
             }
-            else movePersonnage("avancer");
+            else movePersonnage("avancer",1);
         }
         //  tourner a droite
 
@@ -226,53 +192,50 @@ unsigned int Controller::controlPersonnage(unsigned int loop_begin)
 
             if(cartes.at(i)->getArgumentId()==11)
             {
-                movePersonnage("droite");
-                movePersonnage("droite");
+                movePersonnage("droite",2);
             } else
-                movePersonnage("droite");
+                movePersonnage("droite",1);
         }
 
         //  tourner a gauche
         else if(cartes.at(i)->getId() == 10)
         {
             if(cartes.at(i)->getArgumentId()==11){
-                movePersonnage("gauche");
-                movePersonnage("gauche");
+                movePersonnage("gauche",2);
 
             } else
-                movePersonnage("gauche");
+                movePersonnage("gauche",1);
         }
     }
     //  compilateur relou
     return 0;
 }
 
-void Controller::movePersonnage(std::string const movement)
+void Controller::movePersonnage(std::string const movement, unsigned int const nb_turn)
 {
     usleep(200000);
+    for(unsigned int i = 0; i<nb_turn; i++){
 
-    if(movement == "avancer"){
-        if(checkAvancer()){
-            this->movement = 0;
+        if(movement == "avancer"){
+            if(checkAvancer())
+                this->movement = 0;
+            else
+                this->movement = 3;
+
+            animation();
 
         }
-        else{
-            this->movement = 3;
+        else if(movement=="droite"){
+            this->movement = 1;
+            animation();
         }
-        animation();
-        cases.at(personnage->pos().y()/(plateau->size().height()/8)).at(personnage->pos().x()/(plateau->size().width()/8))->deleteCristal();
 
-
-    }
-    else if(movement=="droite"){
-        this->movement = 1;
-        animation();
+        else if(movement=="gauche"){
+            this->movement = 2;
+            animation();
+        }
     }
 
-    else if(movement=="gauche"){
-        this->movement = 2;
-        animation();
-    }
 
 }
 
@@ -282,11 +245,15 @@ void Controller::animation()
     if(movement == 0){
         for(int i = 0; i<plateau->size().height()/8;i++){
             usleep(2000);
-//            cases.at(personnage->pos().y()/(plateau->size().height()/8)).at(personnage->pos().x()/(plateau->size().width()/8))->deleteCristal();
 
-            //faire disparaite le cristal au bon moment
-//            if(i>plateau->size().height()/10){
-//            }
+            //boucle qui check si le perso touche un cristal
+            for(unsigned int i=0; i<cristaux.size();i++){
+
+                if(personnage->collidesWithItem(cristaux.at(i))){
+                    cristaux.at(i)->destroy();
+                }
+            }
+
             personnage->avancer();
             qApp->processEvents();
         }
@@ -327,14 +294,18 @@ void Controller::animation()
 
 
 //  pour afficher les fonctions dans l'ordre des cartes
-void Controller::displayFunctions(std::vector<Carte*> cartes)
+void Controller::displayFunctions()
 {
+
     //  boucle pour nettoyer les textes
-    for(unsigned int i = labels.size();i--;){
+    for(unsigned int i = labels.size()-1;i--;){
         labels.at(i)->setText("");
         if(cartes.empty())
             labels.at(i)->repaint();
     }
+
+
+
 
     unsigned int n=0;
     for(unsigned int i=0; i<cartes.size();i++)
@@ -350,6 +321,7 @@ void Controller::displayFunctions(std::vector<Carte*> cartes)
         }
 
     }
+
 }
 
 //  pour recuperer les labels a modifier
@@ -361,31 +333,17 @@ void Controller::setLabels(std::vector<QLabel*> labels)
 void Controller::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key_Z)
-        movePersonnage("avancer");
+        movePersonnage("avancer",1);
     else if(event->key()==Qt::Key_Q)
-        movePersonnage("gauche");
+        movePersonnage("gauche",1);
     else if(event->key()==Qt::Key_D)
-        movePersonnage("droite");
+        movePersonnage("droite",1);
     else if(event->key()==Qt::Key_R)
         resetPlateau();
-    else if(event->key()==Qt::Key_L){
-        Message *message = new Message(3);
-        message->setText("Niveau suivant");
-        CenterWidgets(message);
-        message->exec();
-        partie->previousLevel();
-        partie->newPartie();
-    }
-    else if(event->key()==Qt::Key_M){
-        Message *message = new Message(3);
-        message->setText("Niveau suivant");
-        CenterWidgets(message);
-        message->exec();
-        partie->nextLevel();
-        partie->newPartie();
-    }
-
-
+    else if(event->key()==Qt::Key_L)
+        newPartie("next");
+    else if(event->key()==Qt::Key_M)
+        newPartie("previous");
 
 }
 
@@ -456,26 +414,57 @@ bool Controller::checkAvancer() const
     return false;
 }
 
-bool Controller::checkWin(std::vector<std::vector<Case *>> cases) const
+// check si tous les cristaux sont recuperes
+bool Controller::checkWin() const
 {
-    // check si les cristaux sont recuperes
     bool checkWin=true;
-    for(unsigned int i=0; i<cases.size();i++){
-        for(unsigned int j=0; j<cases.at(i).size();j++){
-            if(cases.at(i).at(j)->isCristal()) checkWin=false;
-        }
+    for(unsigned int i=0; i<cristaux.size();i++){
+        if(cristaux.at(i)->isVisible())
+            checkWin=false;
     }
     return checkWin;
 }
 
+void Controller::newPartie(const std::string string)
+{
+    if(string == "next"){
+        Message *message = new Message(3);
+        message->setText("Niveau suivant");
+        CenterWidgets(message);
+        message->exec();
+        partie->nextLevel();
+
+    } else if(string=="win"){
+        Message *message = new Message(5);
+        message->setText("Victoire !");
+        CenterWidgets(message);
+        message->exec();
+        partie->nextLevel();
+
+    } else if(string=="previous"){
+        Message *message = new Message(3);
+        message->setText("Niveau suivant");
+        CenterWidgets(message);
+        message->exec();
+        partie->previousLevel();
+
+    }
+
+    partie->newPartie();
+    cristaux = partie->getCristaux();
+
+
+    QString str = "Niveau "+QString::number(partie->getLevel());
+    labels.back()->setText(str);
+}
+
+//  pas besoin de chercher dans le fichier, reset juste personnage et cristaux
 void Controller::resetPlateau()
 {
-    plateau->repaint();
     personnage->reset();
-    for(unsigned int i=0;i<cases.size();i++){
-        for(unsigned int j=0; j<cases.at(i).size();j++){
-            cases.at(i).at(j)->reset();
-        }
+
+    for(unsigned int i=0; i<cristaux.size();i++){
+        cristaux.at(i)->reset();
     }
 }
 

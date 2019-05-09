@@ -36,18 +36,20 @@ private:
     Detection *detection;
     QTimer *timer;
     QGraphicsView *plateau;
+    std::vector<Cristal*> cristaux;
 
-    void displayFunctions(std::vector<Carte*> cartes);
     unsigned int controlPersonnage(unsigned int loop_begin);
-    void movePersonnage(std::string movement);
-    void controlKeys(std::vector<Carte*> cartes);
-    bool checkAvancer() const;
-    bool checkWin(std::vector<std::vector<Case*>> cases) const;
+    void movePersonnage(std::string movement, unsigned int const nb_turn);
+    void animation();
+    void displayFunctions();
+    void newPartie(std::string const string);
     void resetPlateau();
+    bool checkAvancer() const;
+    bool checkWin() const;
     inline void CenterWidgets(QWidget *widget, QWidget *host = 0);
 
 public:
-    Controller(Personnage *personnage, std::vector<std::vector<Case*>> cases, QGraphicsView *plateau);
+    Controller(Partie *partie);
     ~Controller();
     void start();
     void setLabels(std::vector<QLabel*> labels);
@@ -55,7 +57,7 @@ public:
 
 private slots:
     void controlCartes();
-    void animation();
+
 
 };
 
