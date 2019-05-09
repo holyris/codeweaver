@@ -3,11 +3,16 @@
 
 #include <QObject>
 #include <QWidget>
-
-class Cristal
+#include <QGraphicsPixmapItem>
+#include <iostream>
+class Cristal: public QGraphicsPixmapItem
 {
 public:
     Cristal();
+    ~Cristal();
+    void set(unsigned int x, unsigned int y);
+    void destroy();
+    void reset();
 };
 
 #endif // CRISTAL_H
