@@ -1,25 +1,77 @@
 #include "partie.h"
 
-Partie::Partie(Personnage* personnage, std::vector<std::vector<Case*>> cases, QGraphicsView *plateau)
+Partie::Partie()
 {
-    this->personnage = personnage;
-    this->cases = cases;
-    this->plateau = plateau;
-    level = 3;
+    level = 1;
+
+    //  rempli cases avec des objets Case
+    for(unsigned int i = 0; i < 8; i++){
+        std::vector<Case*> vector;
+        for(unsigned int j = 0; j < 8; j++){
+            vector.push_back(new Case());
+        }
+        cases.push_back(vector);
+    }
+    personnage = new Personnage();
+    plateau = new QGraphicsView();
+    scene = new QGraphicsScene();
+
+    scene->addItem(personnage);
+
 }
 
 Partie::~Partie()
 {
     delete personnage;
-    for(unsigned int i =0; i<cases.size();i++){
-        for(unsigned int j = 0; j<cases.at(i).size(); j++)
-            delete cases.at(i).at(j);
-    }
+    delete plateau;
+    delete scene;
+    cristaux.clear();
+    for(unsigned int i =0; i<cases.size();i++)
+        cases.at(i).clear();
+
+
+
+}
+
+Personnage* Partie::getPersonnage() const
+{
+    return this->personnage;
+}
+
+std::vector<std::vector<Case *> > Partie::getCases() const
+{
+    return this->cases;
+}
+
+QGraphicsView* Partie::getPlateau() const
+{
+    return this->plateau;
+}
+
+QGraphicsScene *Partie::getScene() const
+{
+    return this->scene;
+}
+
+std::vector<Cristal *> Partie::getCristaux() const
+{
+    return this->cristaux;
+}
+
+int Partie::getLevel() const
+{
+    return level;
 }
 
 
 void Partie::newPartie()
 {
+    //on enleve les cristaux deja present de la scene
+    for(unsigned int i=0; i<cristaux.size();i++){
+        scene->removeItem(cristaux.at(i));
+    }
+    cristaux.clear();
+
 
     std::ifstream file("maps/maps.txt");
 
@@ -47,12 +99,12 @@ void Partie::newPartie()
         ss << line;
         //  on complete plateformes
         for(int i = 0; i<8; i++) {
-            ss >> plateformes[i];
+            ss >> plateforme[i];
         }
 
         //  on complete cristaux
         for(int i = 0; i<8; i++) {
-            ss >> cristaux[i];
+            ss >> cristal[i];
         }
 
         //  on set le perso
@@ -79,19 +131,23 @@ void Partie::setCases()
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
 
-            //  si les coord de debut du personnage corresponde a i et j, alors cette case commence avec le personnage
-            if(i == personnage_start_y && j == personnage_start_x){
-                cases.at(i).at(j)->set(true, personnage_start_direction, false, true);
+            //on set les cristaux aussi
+            if(((cristal[i] >> j) & 1) ==1 ){
+                cases.at(i).at(j)->set(true);
+                Cristal *cristal = new Cristal();
+                scene->addItem(cristal);
+                cristal->set(
+                            (plateau->size().width()/8) * j,
+                            (plateau->size().height()/8) * i);
+                cristal->setScale( ((plateau->size().height()/8) / cristal->boundingRect().height()) );
+                cristaux.push_back(cristal);
             }
-            else if(((cristaux[i] >> j) & 1) ==1 ){
-                cases.at(i).at(j)->set(false, personnage_start_direction, true, true);
-            }
-            else if(((plateformes[i] >> j) & 1) == 1 ){
-                cases.at(i).at(j)->set(false, personnage_start_direction, false, true);
+            else if(((plateforme[i] >> j) & 1) == 1 ){
+                cases.at(i).at(j)->set(true);
             }
 
             else {
-                cases.at(i).at(j)->set(false, personnage_start_direction, false, false);
+                cases.at(i).at(j)->set(false);
             }
         }
     }
@@ -103,6 +159,7 @@ void Partie::nextLevel()
     if(level == number_of_level)
         level = 1;
     else level++;
+    plateau->update();
 }
 
 void Partie::previousLevel()
@@ -110,4 +167,6 @@ void Partie::previousLevel()
     if(level==1)
         level = number_of_level;
     else level--;
+    plateau->update();
+
 }

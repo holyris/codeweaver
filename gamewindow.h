@@ -25,7 +25,6 @@ class GameWindow : public QWidget
     Q_OBJECT
 
 private:
-    QGraphicsScene *scene;
     Controller *controller;
     Personnage *personnage;
     QGraphicsView *plateau;

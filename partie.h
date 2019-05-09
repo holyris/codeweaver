@@ -6,24 +6,32 @@
 #include <sstream>
 #include "personnage.h"
 #include "case.h"
+#include "cristal.h"
 class Partie
 {
 
 private:
-    int plateformes[8], cristaux[8], personnage_start_x, personnage_start_y, personnage_start_direction, last_rand_line;
+    int plateforme[8], cristal[8], personnage_start_x, personnage_start_y, personnage_start_direction, last_rand_line;
     int level, number_of_level;
-    std::vector<std::vector<Case*>> cases;
+    std::vector<std::vector<Case*> > cases;
+    std::vector<Cristal*> cristaux;
     Personnage *personnage;
     QGraphicsView *plateau;
-public:
-    Partie(Personnage *personnage, std::vector<std::vector<Case*>> cases, QGraphicsView *plateau);
-    ~Partie();
-    void newPartie();
+    QGraphicsScene *scene;
     void setCases();
-    void setPlateformes(int plateformes[8]);
-    void setCristaux(int cristaux[8]);
-    void setPersoX(int personnage_start_x);
-    void setPersoY(int personnage_start_y);
+
+
+public:
+    Partie();
+    ~Partie();
+
+    Personnage *getPersonnage() const;
+    std::vector<std::vector<Case *> > getCases() const;
+    QGraphicsView *getPlateau() const;
+    QGraphicsScene *getScene() const;
+    std::vector<Cristal *> getCristaux() const;
+    int getLevel() const;
+    void newPartie();
     void setPersoDirection(int personnage_start_direction);
     void nextLevel();
     void previousLevel();
