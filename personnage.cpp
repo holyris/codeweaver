@@ -1,11 +1,13 @@
 #include "personnage.h"
 
 
-Personnage::Personnage(QPixmap &pixmap): QGraphicsPixmapItem(pixmap)
+Personnage::Personnage(): QGraphicsPixmapItem(QPixmap("images/personnage.png"))
 {
 //    this->setTransformOriginPoint(this->boundingRect().center());
 
 //    this->setOffset(this->transformOriginPoint());
+    this->setZValue(2);
+
     this->setTransformOriginPoint(this->boundingRect().center());
 
 }

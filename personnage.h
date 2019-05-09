@@ -15,7 +15,7 @@ private:
 
 
 public:
-    Personnage(QPixmap &pixmap);
+    Personnage();
     ~Personnage();
     void set(unsigned int x, unsigned int y, int direction);
     void tourner_droite();
