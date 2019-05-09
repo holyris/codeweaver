@@ -12,9 +12,7 @@ Detection::Detection()
 
 Detection::~Detection()
 {
-    for(unsigned int i =0; i<cartes.size();i++){
-        delete cartes.at(i);
-    }
+    cartes.clear();
 }
 
 std::vector<Carte*> Detection::launch(){
