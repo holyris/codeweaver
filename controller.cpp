@@ -27,7 +27,6 @@ Controller::~Controller()
 
 void Controller::start()
 {
-
     newPartie("");
 
     personnage = partie->getPersonnage();
@@ -47,7 +46,6 @@ void Controller::start()
 //  fonction pour controler le personnage en fonction des cartes captees
 void Controller::controlCartes()
 {
-
 
     cartes = detection->launch();
     displayFunctions();
