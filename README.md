@@ -15,6 +15,8 @@ Ouvrez ce projet avec Qt creator (qui devrait être dans vos applications).
 - Lors de la configuration du projet, si aucun kit n'est valable alors cliquez sur "manage kits" et selectionnez Desktop (il ne devrait y en avoir qu'un)
 - En passant votre souris sur un kit, Qt vous montre quelles configurations n'ont pas été faites (par ex compilateur manquant). Il suffit simplement de les compléter (double clic pour accéder aux config du kit)
 
+Quand le projet est configuré, retournez dans projet dans la barre de gauche : 
+Decochez shadow build pour chaque paramètre de compilation (Debug, Profile, Release).
 
 COMPILATION:
 - executez qmake puis compilez avec Qt 
